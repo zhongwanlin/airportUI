@@ -272,6 +272,28 @@ body {
         padding: 0;
     }
 }
+.noHeaderModal {
+    .ivu-modal-fullscreen {
+        .ivu-modal-content {
+            .ivu-modal-body {
+                top: 0;
+            }
+            .ivu-modal-close {
+                top: 0;
+            }
+        }
+        .modalFooter {
+            text-align: center;
+        }
+    }
+    
+    .ivu-modal-header {
+        display: none;
+    }
+    .ivu-modal-close {
+        top: 0;
+    }
+}
 .modalTable {
     .modalTitle {
         font-size: 16px;
@@ -280,79 +302,28 @@ body {
         color: #000;
     }
     .detail {
+        padding: 20px;
         table {
             width: 100%;
-            .innerNobTable {
-                tr {
-                    td {
-                        border: none;
-                        border-left: 1px solid #dadada;
-                        padding: 0;
-                        .ivu-input-prefix, 
-                        .ivu-input-suffix {
-                            width: 20px;
-                        }
-                        .ivu-input-with-suffix {
-                            padding-right: 20px;
-                        }
-                    }
-                }
-            }
-            &.noborderTable {
-                tr {
-                    td {
-                        border: none;
-                        padding: 0;
-                    }
-                }
-            }
-            &.innerTable {
-                .title {
-                    padding: 5px;
-                    margin-bottom: 5px;
-                    background-color: #f9f9f9;
-                }
-                tr {
-                    &:nth-child(2n) {
-                        td {
-                            padding-bottom: 8px;
-                        }
-                    }
-                    td {
-                        width: auto;
-                    }
-                }
-            }
             tr{
-                &.header {
+                &:last-child {
                     td {
-                        text-align: center;
-                        padding: 0 10px;
-                        background-color: #4d93dc;
-                        color: #fff;
-                    }
-                    &.smallHeader {
-                        td {
-                            padding: 0 10px;
-                        }
-                    }
-                }
-                &.totalRequest {
-                    td {
-                        background-color: #FFEB3B;
-                        font-weight: bold;
-                        font-size: 16px;
+                        border: none;
                     }
                 }
             }
             td {
-                border: 1px solid #dadada;
-                padding: 2px 8px;
+                border-bottom: 1px dashed #dadada;
+                padding: 8px;
                 font-size: 14px;
                 width: 20%;
 
                 img {
                     width: 50%;
+                }
+                .tips {
+                    font-size: 13px;
+                    color: #999;
                 }
                 
                 &.label {

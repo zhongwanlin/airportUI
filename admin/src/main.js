@@ -11,13 +11,7 @@ import utility from "./common/utility";
 import config from "./common/config";
 import qs from 'qs';
 import $ from "jquery";
-import eCharts from 'echarts';
 import "view-design/dist/styles/iview.css";
-import VueQuillEditor from 'vue-quill-editor'
-import 'quill/dist/quill.core.css'
-import 'quill/dist/quill.snow.css'
-import 'quill/dist/quill.bubble.css'
-Vue.use(VueQuillEditor);
 Vue.use(VueAxios, axios);
 Vue.use(iView);
 
@@ -26,7 +20,6 @@ Vue.prototype.$utility = utility;
 Vue.prototype.$config = config;
 Vue.prototype.$qs = qs;
 Vue.prototype.$ = $;
-Vue.prototype.$echarts = eCharts
 
 let VueApp = new Vue({
   store,
@@ -46,10 +39,13 @@ axios.interceptors.response.use(
   response => {
     if (response.data.code == "9003") {
       VueApp.$Message.error("登录超时,请重新登录");
+      utility.cleanSessionStorage();
       if (window.parent) {
-        window.parent.window.location.href = "/lostFound/web/#/login"
+        // window.parent.window.location.href = "/lostFound/web/#/login"
+        window.parent.window.location.replace("/lostFound/web/#/login");
       } else {
-        window.location.href = "/lostFound/web/#/login"
+        // window.location.href = "/lostFound/web/#/login"
+        window.location.replace("/lostFound/web/#/login");
       }
     }
     return response;

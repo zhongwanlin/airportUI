@@ -5,31 +5,13 @@
                 <table>
                     <tr>
                         <td>
-                            <!-- 公司:
-                            <template>
-                                <Select v-model="searchInfo.companyId" clearable placeholder="选择公司" style="width: 240px;">
-                                    <template v-for="(item, index) in companyList">
-                                        <Option :value="item.id" :key="index">{{item.companyName}}</Option>
-                                    </template>
-                                </Select>
-                            </template>
-                            &nbsp;&nbsp;部门:
-                            <template>
-                                <div style="display: inline-block;width: 150px"><Cascader :data="superiorDepartmentList" v-model="searchInfo.paraDeptIds" placeholder="请选择部门" trigger="click" :change-on-select="true"></Cascader></div>
-                            </template> -->
-                            &nbsp;&nbsp;账号:
-                            <template>
-                                <Input v-model="searchInfo.userCode" clearable placeholder="请输入账号" style="width:100px;"/>
-                            </template>
                             &nbsp;&nbsp;用户名:
                             <template>
                                 <Input v-model="searchInfo.userName" clearable placeholder="请输入用户名" style="width:100px;"/>
                             </template>
                             <template>
                                 <div class="searchBtnList">
-                                    <template v-if="!!userFuncCode.addNewUser">
-                                        <Button type="primary" icon="ios-add-circle" @click="showNew">新增</Button>
-                                    </template>
+                                    <Button type="primary" icon="ios-add-circle" @click="showNew">新增</Button>
                                     <Button icon="ios-refresh-circle" @click="reflesh">重置</Button>
                                 </div>
                             </template>
@@ -43,10 +25,8 @@
             <template>
                 <Table :height="height-100" border stripe :loading="isLoading" :columns="columnsRealTime" :data="realTimeDataList">
                     <template slot-scope="{ row, index }" slot="action">
-                        <Button type="text" class="info" size="small" @click="showEdit(row)">修改</Button>
-                        <template v-if="!!userFuncCode['delUser']">
-                        <Button type="text" class="error" size="small" @click="deleteAction(row)">删除</Button>
-                        </template>
+                        <Button type="primary" size="small" @click="showEdit(row)">修改</Button>&nbsp;&nbsp;
+                        <Button type="error" size="small" @click="deleteAction(row)">删除</Button>
                     </template>
                     <template slot-scope="{ row, index }" slot="status">
                         <template>
@@ -66,84 +46,83 @@
         </div>
 
         <template>
-            <Modal v-model="isDetail" class="noContentPadding" :mask-closable="false" width="30" :styles="{top: '5%'}" title="录入" @on-cancel="isDetail=false">
+            <Modal v-model="isDetail" class="noContentPadding noHeaderModal" :mask-closable="false" width="30" :styles="{top: '5%'}" title="新增/修改账号" @on-cancel="isDetail=false">
                 <div class="modalTable">
-                    <div class="detail">
+                    <div class="detail" :style="{maxHeight: (height-200)+'px',overflowY: 'auto'}">
                         <table>
                             <tr>
-                                <td class="label" style="width: 20%;"><span class="request">*</span>公司：</td>
-                                <td style="width: 20%;">
-                                    <template>
-                                        <Select v-model="itemInfo.companyId" clearable placeholder="选择公司" style="width: 100%;">
-                                            <template v-for="(item, index) in companyList">
-                                                <Option :value="item.id" :key="index">{{item.companyName}}</Option>
-                                            </template>
-                                        </Select>
-                                    </template>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="label"><span class="request">*</span>部门：</td>
                                 <td>
-                                    <template>
-                                        <Cascader :data="superiorDepartmentList" v-model="itemInfo.paraDeptIds" placeholder="请选择部门" trigger="click" :change-on-select="true"></Cascader>
-                                    </template>
+                                    <span class="request">*</span>用户名：
+                                    <div><Input v-model="itemInfo.userName" placeholder="填写用户名,可由英文字母、数字组成" style="width: 100%" /></div>
+                                    <div class="tips">必填，可由英文字母、数字组成</div>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="label"><span class="request">*</span>所在机场：</td>
-                                <td>
-                                    <template>
-                                        <Select v-model="itemInfo.areaCode" clearable placeholder="选择所在机场" style="width: 100%;">
-                                            <Option value="T1">T1航站楼</Option>
-                                            <Option value="T2">T2航站楼</Option>
-                                        </Select>
-                                    </template>
+                                <td >
+                                    昵称：
+                                    <div><Input v-model="itemInfo.userName" placeholder="填写昵称,可以是中文" style="width: 100%" /></div>
+                                    <div class="tips">可以是中文</div>
                                 </td>
-                            </tr>
-                            <tr>
-                                <td class="label" style="width: 100px;"><span class="request">*</span>用户账号：</td>
-                                <td><Input v-model="itemInfo.userCode" placeholder="填写用户账号,2~50位字符" style="width: 100%" /></td>
-                            </tr>
-                            <tr>
-                                <td class="label"><span class="request">*</span>用户名称：</td>
-                                <td><Input v-model="itemInfo.userName" placeholder="填写用户名称,填写个人真实姓名" style="width: 100%" /></td>
-                            </tr>
-                            <tr>
-                                <td class="label"><span class="request">*</span>帐号状态：</td>
-                                <td>
-                                    <Select v-model="itemInfo.status" clearable placeholder="选择帐号状态" style="width: 100%;">
-                                        <template v-for="(item, index) in userStatusType">
-                                            <Option :value="item.type" :key="index">{{item.name}}</Option>
-                                        </template>
-                                    </Select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="label"><span class="request">*</span>登录密码：</td>
-                                <td><Input v-model="itemInfo.userPwd" placeholder="填写登录密码,至少6个字符,最多18个字符" style="width: 100%" /></td>
                             </tr>
                             
                             <tr>
-                                <td class="label"><span class="request">*</span>角色：</td>
                                 <td>
-                                    <template>
-                                        <Select v-model="itemInfo.roleIds" clearable placeholder="选择角色" style="width: 100%;">
-                                            <template v-for="(item, index) in roleList">
-                                                <Option :value="item.id" :key="index">{{item.roleName}}</Option>
-                                            </template>
-                                        </Select>
-                                    </template>
+                                    <span class="request">*</span>密码：
+                                    <div><Input v-model="itemInfo.userPwd" placeholder="填写登录密码,至少6个字符,最多18个字符" style="width: 100%" /></div>
+                                    <div class="tips">必填，至少6个字符,最多18个字符</div>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    <span class="request">*</span>角色：
+                                    <div>
+                                        <template>
+                                            <Select v-model="itemInfo.roleIds" clearable placeholder="选择角色" style="width: 100%;">
+                                                <template v-for="(item, index) in roleList">
+                                                    <Option :value="item.id" :key="index">{{item.roleName}}</Option>
+                                                </template>
+                                            </Select>
+                                        </template>
+                                    </div>
+                                    <div class="tips">非超级管理员，禁止创建与当前角色同级的用户</div>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="label">手机号码：</td>
-                                <td><Input v-model="itemInfo.mobile" placeholder="手机号码" style="width: 100%" /></td>
+                                <td>
+                                    手机号码：
+                                    <div><Input v-model="itemInfo.mobile" placeholder="手机号码" style="width: 100%" /></div>
+                                </td>
                             </tr>
-                            <!-- <tr>
-                                <td class="label">常用邮箱：</td>
-                                <td><Input v-model="itemInfo.email" placeholder="常用邮箱" style="width: 100%" /></td>
-                            </tr> -->
+                            <tr>
+                                <td>
+                                    邮箱：
+                                    <div><Input v-model="itemInfo.email" placeholder="常用邮箱" style="width: 100%" /></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    头像：
+                                    <div>
+                                        <template>
+                                            <Upload action="//jsonplaceholder.typicode.com/posts/">
+                                                <Button icon="ios-cloud-upload-outline">上传单张图片</Button>
+                                            </Upload>
+                                        </template>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="request">*</span>帐号状态：
+                                    <div>
+                                        <RadioGroup>
+                                            <Radio label="0">禁用</Radio>
+                                            <Radio label="1">启用</Radio>
+                                        </RadioGroup>
+                                    </div>
+                                </td>
+                            </tr>
                         </table>
                     </div>
                 </div>
@@ -207,12 +186,6 @@ export default {
                 type: "index",
                 width: 60,
             },
-            // {
-            //     align: "center",
-            //     title: "公司名称",
-            //     key: "companyName",
-            //     width: 260,
-            // },
             {
                 title: "账号名",
                 align: "center",

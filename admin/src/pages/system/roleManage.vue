@@ -5,14 +5,6 @@
                 <table>
                     <tr>
                         <td>
-                             <!-- 公司:
-                            <template>
-                                <Select v-model="searchInfo.companyId" clearable placeholder="选择公司" style="width: 240px;">
-                                    <template v-for="(item, index) in companyList">
-                                        <Option :value="item.id" :key="index">{{item.companyName}}</Option>
-                                    </template>
-                                </Select>
-                            </template> -->
                             &nbsp;&nbsp;角色名称
                             <template>
                                 <Input v-model="searchInfo.roleName" clearable placeholder="请输入角色名称" style="width:150px;"/>
@@ -33,9 +25,9 @@
             <template>
                 <Table :height="height-100" border stripe :loading="isLoading" :columns="columnsRealTime" :data="realTimeDataList">
                     <template slot-scope="{ row, index }" slot="action">
-                        <Button type="text" class="primary" size="small" @click="showRoleFunctions(row)">权限设置</Button>
-                        <Button type="text" class="info" size="small" @click="showEdit(row)">修改</Button>
-                        <Button type="text" class="error" size="small" @click="deleteAction(row)">删除</Button>
+                        <Button type="warning" size="small" @click="showRoleFunctions(row)">权限设置</Button>&nbsp;&nbsp;
+                        <Button type="primary" size="small" @click="showEdit(row)">修改</Button>&nbsp;&nbsp;
+                        <Button type="error" size="small" @click="deleteAction(row)">删除</Button>
                     </template>
                 </Table>
             </template>
@@ -47,44 +39,40 @@
         </div>
 
         <template>
-            <Modal v-model="isDetail" class="noContentPadding" :mask-closable="false" width="30" :styles="{top: '5%'}" title="角色录入" @on-cancel="isDetail=false">
+            <Modal v-model="isDetail" class="noContentPadding noHeaderModal" :mask-closable="false" width="30" :styles="{top: '5%'}" title="角色录入" @on-cancel="isDetail=false">
                 <div class="modalTable">
                     <div class="detail">
                         <table>
                             <tr>
-                                <td class="label" style="width: 20%;"><span class="request">*</span>所属公司：</td>
-                                <td style="width: 20%;">
-                                    <template>
-                                        <Select v-model="itemInfo.companyId" clearable placeholder="选择公司" style="width: 100%;">
-                                            <template v-for="(item, index) in companyList">
-                                                <Option :value="item.id" :key="index">{{item.companyName}}</Option>
-                                            </template>
-                                        </Select>
-                                    </template>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="label"><span class="request">*</span>角色名称：</td>
-                                <td><Input v-model="itemInfo.roleName" placeholder="填写角色名称,2~8为字符" style="width: 100%" /></td>
-                            </tr>
-                            <tr>
-                                <td class="label"><span class="request">*</span>角色编码：</td>
-                                <td><Input v-model="itemInfo.roleCode" placeholder="填写角色编码,2~15为字符" style="width: 100%" /></td>
-                            </tr>
-                            <tr>
-                                <td class="label"><span class="request">*</span>是否可用：</td>
                                 <td>
-                                    <template>
-                                        <Select v-model="itemInfo.isValid" clearable placeholder="选择是否可用" style="width: 100%;">
-                                            <Option :value="1">可用</Option>
-                                            <Option :value="0">不可用</Option>
-                                        </Select>
-                                    </template>
+                                    <span class="request">*</span>角色名称：
+                                    <div><Input v-model="itemInfo.roleName" placeholder="填写角色名称,2~8为字符" style="width: 100%" /></div>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="label">角色描述：</td>
-                                <td><Input v-model="itemInfo.roleDesc" placeholder="填写角色描述" style="width: 100%" /></td>
+                                <td>
+                                    <span class="request">*</span>角色编码：
+                                    <div><Input v-model="itemInfo.roleCode" placeholder="填写角色编码,2~15为字符" style="width: 100%" /></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="request">*</span>是否可用：
+                                    <div>
+                                        <template>
+                                            <RadioGroup>
+                                                <Radio label="0">不可用</Radio>
+                                                <Radio label="1">可用</Radio>
+                                            </RadioGroup>
+                                        </template>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    角色描述：
+                                    <div><Input v-model="itemInfo.roleDesc" placeholder="填写角色描述" style="width: 100%" /></div>
+                                </td>
                             </tr>
                         </table>
                     </div>

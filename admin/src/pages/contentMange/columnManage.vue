@@ -38,44 +38,41 @@
         </div>
 
         <template>
-            <Modal v-model="isDetail" class="noContentPadding" :mask-closable="false" width="30" :styles="{top: '5%'}" title="角色录入" @on-cancel="isDetail=false">
+            <Modal v-model="isDetail" class="noContentPadding noHeaderModal" :mask-closable="false" width="30" :styles="{top: '5%'}" title="角色录入" @on-cancel="isDetail=false">
                 <div class="modalTable">
                     <div class="detail">
                         <table>
                             <tr>
-                                <td class="label" style="width: 20%;"><span class="request">*</span>所属公司：</td>
-                                <td style="width: 20%;">
-                                    <template>
-                                        <Select v-model="itemInfo.companyId" clearable placeholder="选择公司" style="width: 100%;">
-                                            <template v-for="(item, index) in companyList">
-                                                <Option :value="item.id" :key="index">{{item.companyName}}</Option>
-                                            </template>
-                                        </Select>
-                                    </template>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="label"><span class="request">*</span>角色名称：</td>
-                                <td><Input v-model="itemInfo.roleName" placeholder="填写角色名称,2~8为字符" style="width: 100%" /></td>
-                            </tr>
-                            <tr>
-                                <td class="label"><span class="request">*</span>角色编码：</td>
-                                <td><Input v-model="itemInfo.roleCode" placeholder="填写角色编码,2~15为字符" style="width: 100%" /></td>
-                            </tr>
-                            <tr>
-                                <td class="label"><span class="request">*</span>是否可用：</td>
                                 <td>
-                                    <template>
-                                        <Select v-model="itemInfo.isValid" clearable placeholder="选择是否可用" style="width: 100%;">
-                                            <Option :value="1">可用</Option>
-                                            <Option :value="0">不可用</Option>
-                                        </Select>
-                                    </template>
+                                    <span class="request">*</span>栏目名称：
+                                    <div><Input v-model="itemInfo.roleName" placeholder="填写栏目名称" style="width: 100%" /></div>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="label">角色描述：</td>
-                                <td><Input v-model="itemInfo.roleDesc" placeholder="填写角色描述" style="width: 100%" /></td>
+                                <td>
+                                    <span class="request">*</span>英文名称：
+                                    <div><Input v-model="itemInfo.roleCode" placeholder="填写英文名称" style="width: 100%" /></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="request">*</span>所属区域：
+                                    <div>
+                                        <template>
+                                            <Select v-model="itemInfo.isValid" clearable placeholder="选择所属区域" style="width: 100%;"></Select>
+                                        </template>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    上级栏目（不选择为顶级栏目）：
+                                    <div>
+                                        <template>
+                                            <Select clearable placeholder="选择上级栏目" style="width: 100%;"></Select>
+                                        </template>
+                                    </div>
+                                </td>
                             </tr>
                         </table>
                     </div>
