@@ -39,14 +39,15 @@ axios.interceptors.response.use(
   response => {
     if (response.data.code == "9003") {
       VueApp.$Message.error("登录超时,请重新登录");
+      utility.cleanLocalStorage();
       utility.cleanSessionStorage();
-      if (window.parent) {
-        // window.parent.window.location.href = "/lostFound/web/#/login"
-        window.parent.window.location.replace("/lostFound/web/#/login");
-      } else {
-        // window.location.href = "/lostFound/web/#/login"
-        window.location.replace("/lostFound/web/#/login");
-      }
+      setTimeout(()=>{
+        if (window.parent) {
+          window.parent.window.location.href = window.location.pathname+'#/login';
+        } else {
+          window.location.href = window.location.pathname+'#/login';
+        }
+      }, 2000);
     }
     return response;
   },

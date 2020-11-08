@@ -82,7 +82,6 @@
             </Modal>
         </template>
 
-        
     </div>
 </template>
 

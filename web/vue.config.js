@@ -8,7 +8,7 @@ module.exports = {
   },
   lintOnSave: false,
   outputDir: './dist',
-  publicPath: process.env.NODE_ENV === 'production' ? '/09' : '/', // 测试和本地环境
+  publicPath: process.env.NODE_ENV === 'production' ? '/' : '/', // 测试和本地环境
   css: {
     loaderOptions: {
       postcss: {
