@@ -3,15 +3,15 @@
         <div class="topHeader">
             <div class="logo">首都机场大屏后台管理系统</div>
             <div class="user">
-                <span class="info">{{!!userInfo?userInfo.userCode:''}}（{{!!userInfo?userInfo.userName:''}}）</span>
+                <span class="info">{{!!userInfo?userInfo.nickname:''}}（{{!!userInfo?userInfo.username:''}}）</span>
                 <span class="info logOut" @click="logOut">退出 <span><Icon type="md-exit" size="24" /></span></span>
-                <div class="logOutWrap">
+                <!-- <div class="logOutWrap">
                     <span class="mdArrow"><Icon type="md-arrow-dropup" color="#333" size="48" /></span>
                     <div class="modifPass" @click="showEditPass">修改密码</div>
                     <div class="logOutTxt" @click="logOut">
                         退出 <span><Icon type="md-exit" size="24" /></span>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
 
@@ -159,22 +159,24 @@ export default {
         // 退出
         logOut() {
             var self = this;
-            self.axios({
-                method: 'post',
-                headers: self.$utility.setHeader(self.$config.service.userService),
-                url: self.$config.action.userLogout,
-            })
-            .then(function (res) {
-                if(res.data.code=='200') {
-                    self.$utility.cleanLocalStorage();
-                    window.parent.location.replace("#/login");
-                } else {
-                    self.$Message.error(res.data.message);
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
+            self.$utility.cleanLocalStorage();
+            window.parent.location.replace("#/login");
+
+            // self.axios({
+            //     method: 'post',
+            //     url: self.$config.action.userLogout,
+            // })
+            // .then(function (res) {
+            //     if(res.data.code=='0') {
+            //         self.$utility.cleanLocalStorage();
+            //         window.parent.location.replace("#/login");
+            //     } else {
+            //         self.$Message.error(res.data.message);
+            //     }
+            // })
+            // .catch(function (error) {
+            //     console.log(error);
+            // });
         },
         saveAction(){
             var self = this;
@@ -201,7 +203,7 @@ export default {
                 })
             })
             .then(function (res) {
-                if(res.data.code=='200') {
+                if(res.data.code=='0') {
                     self.$Message.success("密码修改成功,请重新登录");
                     self.logOut();
                 } else {
@@ -217,7 +219,7 @@ export default {
     },
     created() {
         let self = this;
-        self.userInfo = self.$utility.getLocalStorage("lostFoundUserInfo");
+        self.userInfo = self.$utility.getLocalStorage("userInfo");
         if(!self.userInfo) {
             self.$router.push({
                 name: "login"

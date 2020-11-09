@@ -1,8 +1,5 @@
 const menu = (function (menu) {
 	menu.setMenuList = function(self){
-        let userFuncInfo = {};
-        let userFuncCode = {};
-        let userFuncList = self.userInfo.userFuncList;
         let menuInfo = {
             "系统管理": {
                 "index": "1",
@@ -181,25 +178,7 @@ const menu = (function (menu) {
                 ]
             }
         };
-        
-        // userFuncList.forEach((item)=>{
-        //     userFuncInfo[item.functionName] = item.functionName;
-        //     userFuncCode[item.functionCode] = item.functionCode;
-        // });
-        // for(let key in menuInfo) {
-        //     if(!!userFuncInfo[key]) {
-        //         menuInfo[key]["isShow"] = true;
-        //         menuInfo[key]["list"].forEach((item,index)=>{
-        //             if(!!userFuncInfo[item["label"]]) {
-        //                 menuInfo[key]["list"][index]["isShow"] = true;
-        //             }
-        //         });
-        //     }
-        // }
-        // self.$utility.setSessionStorage("userFuncInfo", userFuncInfo);
-        // self.$utility.setSessionStorage("userFuncCode", userFuncCode);
 		return {
-            userFuncCode: userFuncCode,
             menuInfo: menuInfo
         }
     };

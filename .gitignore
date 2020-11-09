@@ -1,8 +1,4 @@
 admin/node_modules
-<<<<<<< HEAD
-web
-node_modules
-=======
+admin/dist
 web/node_modules
->>>>>>> 83f22d21bb83ad316fd024e0e0e9dfbd1df3449c
-dist
+web/dist

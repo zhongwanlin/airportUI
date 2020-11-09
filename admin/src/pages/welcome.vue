@@ -417,7 +417,7 @@ export default {
         let userTimeOut = null;
         let end = new Date();
         let start = new Date();
-        self.userInfo = self.$utility.getLocalStorage("lostFoundUserInfo");
+        self.userInfo = self.$utility.getLocalStorage("userInfo");
         start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
 
         self.byStatusSearch = [start.getFullYear()+'-'+(start.getMonth()+1)+'-'+start.getDate(), end.getFullYear()+'-'+(end.getMonth()+1)+'-'+end.getDate()];

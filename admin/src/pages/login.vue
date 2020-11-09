@@ -8,12 +8,12 @@
             <div class="inputInfo">
                 <div class="inputList">
                     <div class="item">
-                        <Input size="large" :disabled="loading" v-model="loginInfo.userCode" placeholder="请输入用户名">
+                        <Input size="large" :disabled="loading" v-model="loginInfo.username" placeholder="请输入用户名">
                         <Icon type="md-person" size="22" color="#808695" slot="prefix" />
                         </Input>
                     </div>
                     <div class="item">
-                        <Input size="large" :disabled="loading" type="password" v-model="loginInfo.userPwd"  placeholder="请输入密码">
+                        <Input size="large" :disabled="loading" type="password" v-model="loginInfo.password"  placeholder="请输入密码">
                         <Icon type="md-unlock" size="22" color="#808695" slot="prefix" />
                         </Input>
                     </div>
@@ -58,36 +58,29 @@ export default {
             let self = this;
             let timestamp = Date.parse(new Date());
             self.loading = true;
-            if(self.$utility.checkLen(self.loginInfo.userCode, 0)) {
+            if(self.$utility.checkLen(self.loginInfo.username, 0)) {
                 self.$Message.error("请输入用户名");
                 self.loading = false;
                 return;
             }
-            if(self.$utility.checkLen(self.loginInfo.userPwd, 0)) {
+            if(self.$utility.checkLen(self.loginInfo.password, 0)) {
                 self.$Message.error("请输入密码");
                 self.loading = false;
                 return;
             }
 
-            // if(self.$utility.checkLen(self.verifyInfo.imgCode, 0)) {
-            //     self.$Message.error("请输入验证码");
-            //     self.loading = false;
-            //     return;
-            // }
-
             self.axios({
                 method: 'post',
-                headers: self.$utility.setHeader(self.$config.service.userService),
                 url: self.$config.action.userLogin,
-                data: self.$qs.stringify({
-                    "userCode": self.loginInfo.userCode,
-                    "userPwd": md5(self.loginInfo.userPwd).toUpperCase()
-                })
+                data: {
+                    "username": self.loginInfo.username,
+                    "password": md5(self.loginInfo.password).toUpperCase()
+                }
             })
             .then(function (res) {
-                if(res.data.code=='200') {
+                if(res.data.code=='0') {
                     let data = res.data.data;
-                    self.$utility.setLocalStorage("lostFoundUserInfo", res.data.data);
+                    self.$utility.setLocalStorage("userInfo", res.data.data);
                     self.$router.push({
                         name: "index"
                     });
@@ -104,7 +97,7 @@ export default {
     },
     created() {
         let self = this;
-        self.userInfo = self.$utility.getLocalStorage("lostFoundUserInfo");
+        self.userInfo = self.$utility.getLocalStorage("userInfo");
         if(!!self.userInfo) {
             self.$router.push({
                 name: "index"

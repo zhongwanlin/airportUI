@@ -291,7 +291,7 @@ export default {
     created() {
         let self = this;
         let userTimeOut = null;
-        self.userInfo = self.$utility.getLocalStorage("lostFoundUserInfo");
+        self.userInfo = self.$utility.getLocalStorage("userInfo");
 
         self.getLostCustomerEvaluationList(true);
 

@@ -365,7 +365,7 @@ var utility = (function (utility) {
 
 	utility.setHeader = function(actionUrl, contentType) {
 		var timestamp = Date.parse(new Date());
-		var userInfo = utility.getLocalStorage("lostFoundUserInfo");
+		var userInfo = utility.getLocalStorage("userInfo");
 		return {
 			"Content-Type": contentType||'application/x-www-form-urlencoded',
 			"version": 100, // 默认100

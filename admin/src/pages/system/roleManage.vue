@@ -7,7 +7,7 @@
                         <td>
                             &nbsp;&nbsp;角色名称
                             <template>
-                                <Input v-model="searchInfo.roleName" clearable placeholder="请输入角色名称" style="width:150px;"/>
+                                <Input v-model="searchInfo.name" clearable placeholder="请输入角色名称" style="width:150px;"/>
                             </template>
                             <template>
                                 <div class="searchBtnList">
@@ -46,32 +46,13 @@
                             <tr>
                                 <td>
                                     <span class="request">*</span>角色名称：
-                                    <div><Input v-model="itemInfo.roleName" placeholder="填写角色名称,2~8为字符" style="width: 100%" /></div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <span class="request">*</span>角色编码：
-                                    <div><Input v-model="itemInfo.roleCode" placeholder="填写角色编码,2~15为字符" style="width: 100%" /></div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <span class="request">*</span>是否可用：
-                                    <div>
-                                        <template>
-                                            <RadioGroup>
-                                                <Radio label="0">不可用</Radio>
-                                                <Radio label="1">可用</Radio>
-                                            </RadioGroup>
-                                        </template>
-                                    </div>
+                                    <div><Input v-model="itemInfo.name" placeholder="填写角色名称,2~8为字符" style="width: 100%" /></div>
                                 </td>
                             </tr>
                             <tr>
                                 <td>
                                     角色描述：
-                                    <div><Input v-model="itemInfo.roleDesc" placeholder="填写角色描述" style="width: 100%" /></div>
+                                    <div><Input v-model="itemInfo.description" placeholder="填写角色描述" style="width: 100%" /></div>
                                 </td>
                             </tr>
                         </table>
@@ -163,19 +144,13 @@ export default {
             pageSize: 50,
         },
         searchInfo: {
-            "companyId": "", // 所属公司ID，手动从公司列表选择
-            "roleName": "", // 角色名称
+            "name": "", // 角色名称
         },
         itemInfo: {
             "id": "", // 系统角色ID，修改时必传
-            "companyId": "", // 所属公司ID，手动从公司列表选择
-            "roleName": "", // 角色名称
-            "roleCode": "", // 角色编码
-            "roleDesc": "", // 角色描述
-            "isValid": 1, // 分组是否可用，默认=1 0=否 1=是
-            "isPublic": 1, // 是否公共角色 0=否 1=是
-            "createUserId": "", // 创建用户ID，新增时必传
-            "modifyUserId": "", // 修改用户ID，修改时必传
+            "description": "",
+            "menu_auth": "",
+            "name": "",
         },
         columnsRealTime: [
             {
@@ -184,28 +159,21 @@ export default {
                 type: "index",
                 width: 60,
             },
-            // {
-            //     align: "center",
-            //     title: "公司名称",
-            //     key: "companyName",
-            // },
             {
                 title: "角色名称",
                 align: "center",
-                key: "roleName",
+                key: "name",
             },
-            {
-                title: "是否有效",
-                align: "center",
-                key: "isValid",
-                render: function (h, params) {
-                    return h("span", params.row.isValid==1?'可用':'不可用');
-                }
-            },
+            // {
+            //     title: "状态",
+            //     align: "center",
+            //     key: "status",
+            //     slot: "status"
+            // },
             {
                 title: "角色描述",
                 align: "center",
-                key: "roleDesc",
+                key: "description",
             },
             {
                 align: "center",
@@ -274,19 +242,18 @@ export default {
                 self.pageInfo.pageIndex = 0;
             }
             self.axios({
-                method: 'post',
-                headers: self.$utility.setHeader(self.$config.service.permissionService),
-                url: self.$config.action.getRoleList,
-                data: self.$qs.stringify({
+                method: 'get',
+                url: self.$config.action.roleList,
+                params: {
                     "pageNum": self.pageInfo.pageIndex,
                     "pageSize": self.pageInfo.pageSize,
-                    "companyId": self.searchInfo.companyId, // 查询关键字（公司名称）
-                    "roleName": encodeURI(self.searchInfo.roleName), // 上级公司ID
-                })
+                }
             })
             .then(function (res) {
-                if(res.data.code=='200') {
-                    self.realTimeDataList = res.data.data;
+                self.realTimeDataList = res.data.list;
+                self.count = res.data.count;
+                if(res.data.code=='0') {
+                    self.realTimeDataList = res.data.list;
                     self.count = res.data.count;
                 } else if(res.data.code=='9003') {
                     self.utility.loginTimeOut(self);
@@ -305,14 +272,9 @@ export default {
             let self = this;
             self.itemInfo = {
                 "id": "", // 系统角色ID，修改时必传
-                "companyId": "", // 所属公司ID，手动从公司列表选择
-                "roleName": "", // 角色名称
-                "roleCode": "", // 角色编码
-                "roleDesc": "", // 角色描述
-                "isValid": 1, // 分组是否可用，默认=1 0=否 1=是
-                "isPublic": 1, // 是否公共角色 0=否 1=是
-                "createUserId": "", // 创建用户ID，新增时必传
-                "modifyUserId": "", // 修改用户ID，修改时必传
+                "description": "",
+                "menu_auth": "",
+                "name": "",
             };
             self.itemInfo.companyId = !!self.companyList[0]?self.companyList[0]["id"]:'';
             self.isDetail = true;
@@ -336,38 +298,25 @@ export default {
         // 保存公司
         saveAction(){
             let self = this;
-            if(!self.itemInfo.companyId) {
-                self.$Message.error("请选择公司");
-                return;
-            }
-            if(self.itemInfo.roleName.trim().length==0) {
+            
+            if(self.itemInfo.name.trim().length==0) {
                 self.$Message.error("请输入角色名称");
-                return;
-            }
-            if(self.itemInfo.roleCode.trim().length==0) {
-                self.$Message.error("请输入角色编码");
                 return;
             }
             
             self.disable = true;
             self.axios({
                 method: 'post',
-                headers: self.$utility.setHeader(self.$config.service.permissionService),
-                url: self.$config.action.saveRole,
-                data: self.$qs.stringify({
+                url: !self.itemInfo.id?self.$config.action.roleAdd:self.$config.action.roleEdit,
+                data: {
                     "id": self.itemInfo.id || 0, 
-                    "companyId": self.itemInfo.companyId,
-                    "roleName": encodeURI(self.itemInfo.roleName),
-                    "roleCode": encodeURI(self.itemInfo.roleCode),
-                    "roleDesc": encodeURI(self.itemInfo.roleDesc), // 角色描述
-                    "isValid": self.itemInfo.isValid,
-                    "isPublic": self.itemInfo.isPublic,
-                    "createUserId": self.userInfo["id"], // 创建用户ID，新增时必传
-                    "modifyUserId": self.userInfo["id"], // 修改用户ID，修改时必传
-                })
+                    "description": self.itemInfo.description,
+                    "menu_auth": self.itemInfo.menu_auth,
+                    "name": self.itemInfo.name
+                }
             })
             .then(function (res) {
-                if(res.data.code=='200') {
+                if(res.data.code=='0') {
                     self.$Message.success("提交成功");
                     self.getList(false);
                     self.isDetail = false;
@@ -398,19 +347,17 @@ export default {
         deleteAction(item){
             let self = this;
             self.$Modal.confirm({
-                "title": "确定删除"+ item.roleName+"?",
+                "title": "确定删除"+ item.name+"?",
                 onOk() {
                     self.axios({
                         method: 'post',
-                        headers: self.$utility.setHeader(self.$config.service.permissionService),
-                        url: self.$config.action.delRole,
-                        data: self.$qs.stringify({
-                            "ids": item.id, // 公司ID，修改公司信息时必传
-                            "modifyUserId": self.userInfo["id"], // 修改用户ID，修改时必传
-                        })
+                        url: self.$config.action.roleDelete,
+                        data: {
+                            "id": item.id
+                        }
                     })
                     .then(function (res) {
-                        if(res.data.code=='200') {
+                        if(res.data.code=='0') {
                             self.$Message.success("删除成功");
                             self.getList(true);
                         } else if(res.data.code=='9003') {
@@ -425,26 +372,27 @@ export default {
                 }
             });
         },
-        // 获取公司
-        getCompanyList(){
-            var self = this;
+        // 启用或禁用
+        enableOrNot(value, row){
+            let self = this;
             self.axios({
                 method: 'post',
-                headers: self.$utility.setHeader(self.$config.service.companyService),
-                url: self.$config.action.getCompanyList,
-                data: self.$qs.stringify({
-                    "pageNum": 1,
-                    "pageSize": 1000
-                })
+                headers: {
+                    token: self.userInfo.token
+                },
+                url: value==1?self.$config.action.roleEnable:self.$config.action.roleDisable,
+                data: {
+                    "id": row.id
+                }
             })
             .then(function (res) {
-                if(res.data.code=='200') {
-                    self.companyList = res.data.data;
-                    self.searchInfo.companyId = self.userInfo.companyId;
-                } else if(res.data.code=='9003') {
-                    self.utility.loginTimeOut(self);
+                if (res.data.code == '0') {
+                    self.$Message.success("修改成功");
+                    self.getList(false);
+                } else if (res.data.code == "419") {
+                    self.$utility.loginTimeOut(self);
                 } else {
-                    self.$Message.error(res.data.message);
+                    self.$Message.error(res.data.msg);
                 }
             })
             .catch(function (error) {
@@ -494,7 +442,7 @@ export default {
                 })
             })
             .then(function (res) {
-                if(res.data.code=='200') {
+                if(res.data.code=='0') {
                     self.roleFunctionTableRowList = res.data.data;
                     self.roleFunctionPageInfo.count = res.data.count;
                 } else if(res.data.code=='9003') {
@@ -508,18 +456,6 @@ export default {
                 console.log(error);
                 self.isModalLoading = false;
             });
-        },
-        getSuper: function (list, value) {
-            var self = this;
-            for (var i = 0, len = list.length; i < len; i++) {
-                if (list[i]["id"] == value) {
-                    self.selectFunction.push(value);
-                    list[i]["checked"] = true;
-                    break;
-                } else {
-                    self.getSuper(list[i]["children"], value);
-                }
-            }
         },
         setChecked: function () {
             var self = this;
@@ -560,7 +496,7 @@ export default {
                 })
             })
             .then(function (res) {
-                if(res.data.code=='200') {
+                if(res.data.code=='0') {
                     self.formatFunctions(res.data.data);
                 } else if(res.data.code=='9003') {
                     self.utility.loginTimeOut(self);
@@ -588,7 +524,7 @@ export default {
                 })
             })
             .then(function (res) {
-                if(res.data.code=='200') {
+                if(res.data.code=='0') {
                     self.getRoleFunctionsDataList(true);
                 } else if(res.data.code=='9003') {
                     self.utility.loginTimeOut(self);
@@ -625,7 +561,7 @@ export default {
                 })
             })
             .then(function (res) {
-                if(res.data.code=='200') {
+                if(res.data.code=='0') {
                     self.getRoleFunctionsDataList(true);
                 } else if(res.data.code=='9003') {
                     self.utility.loginTimeOut(self);
@@ -641,10 +577,9 @@ export default {
     created() {
         let self = this;
         let userTimeOut = null;
-        self.userInfo = self.$utility.getLocalStorage("lostFoundUserInfo");
+        self.userInfo = self.$utility.getLocalStorage("userInfo");
         
-        // self.getList(true); // 获取角色
-        self.getCompanyList(); // 获取公司列表
+        self.getList(true); // 获取角色
 
         self.$watch('searchInfo', function () {
             clearTimeout(userTimeOut);

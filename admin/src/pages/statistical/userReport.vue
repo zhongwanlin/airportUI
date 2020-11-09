@@ -7,9 +7,8 @@
                         <td>
                             区域
                             <template>
-                                <Select v-model="searchInfo.satisfiedFlag" clearable placeholder="选择是否满意" style="width: 120px;">
-                                    <Option :value="1">满意</Option>
-                                    <Option :value="2">不满意</Option>
+                                <Select v-model="searchInfo.satisfiedFlag" clearable placeholder="选择区域" style="width: 120px;">
+                                    
                                 </Select>
                             </template>
                             &nbsp;&nbsp;时间
@@ -228,9 +227,9 @@ export default {
     created() {
         let self = this;
         let userTimeOut = null;
-        self.userInfo = self.$utility.getLocalStorage("lostFoundUserInfo");
+        self.userInfo = self.$utility.getLocalStorage("userInfo");
 
-        self.getLostCustomerEvaluationList(true);
+        // self.getLostCustomerEvaluationList(true);
 
         self.$watch('searchInfo', function () {
             clearTimeout(userTimeOut);

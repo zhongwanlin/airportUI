@@ -596,7 +596,7 @@ export default {
     created() {
         let self = this;
         let userTimeOut = null;
-        self.userInfo = self.$utility.getLocalStorage("lostFoundUserInfo");
+        self.userInfo = self.$utility.getLocalStorage("userInfo");
         
         // self.getList(true); // 获取角色
         self.getCompanyList(); // 获取公司列表
