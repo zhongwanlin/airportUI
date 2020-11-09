@@ -17,7 +17,8 @@
 export default {
     name: "department",
     props: {
-        parentItem: Object
+        parentItem: Object,
+        orgId: Number
     },
     components: { },
     data: () => ({
@@ -83,7 +84,8 @@ export default {
                 url: self.$config.action.userList,
                 params: {
                     "pageNum": self.pageInfo.pageIndex,
-                    "pageSize": self.pageInfo.pageSize
+                    "pageSize": self.pageInfo.pageSize,
+                    "orgId": self.orgId
                 }
             })
             .then(function (res) {
@@ -105,15 +107,22 @@ export default {
         }
     },
     created() {
-        let self = this;
-        let userTimeOut = null;
-        self.userInfo = self.$utility.getLocalStorage("userInfo");
-
-        self.getList(true);
+        
     },
     mounted() {
         let self = this;
         let resizeTime = null;
+        let userTimeOut = null;
+        self.userInfo = self.$utility.getLocalStorage("userInfo");
+        self.getList(true);
+        self.$watch('orgId', function () {
+            clearTimeout(userTimeOut);
+            userTimeOut = setTimeout(() => {
+                self.getList(true);
+            }, 200);
+        }, {
+            deep: true
+        });
         window.onresize = function() {
             clearTimeout(resizeTime);
             resizeTime = setTimeout(function () {

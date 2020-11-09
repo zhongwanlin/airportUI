@@ -1,28 +1,28 @@
 <template>
     <div class="page">
-        <div style="padding: 50px;">
-            <div :style="{height: (height-90)+'px'}">
+        <div style="padding: 20px;">
+            <div :style="{height: (height-60)+'px'}">
                 <Split value="400" min="400px">
                     <div slot="left" class="demo-split-pane">
-                        <div class="tableList" style="border: 1px solid #dcdee2;" :style="{height: (height-90)+'px'}">
+                        <div class="tableList" style="border: 1px solid #dcdee2;" :style="{height: (height-60)+'px'}">
                             <div class="splitTitle">
                                 组织架构
                                 <div class="searchBtnList">
                                     <Button type="primary" size="small" style="margin-right: 10px;" icon="ios-add-circle" @click="showNew">新增公司</Button>
                                 </div>
                             </div>
-                            <div class="splitBox">
+                            <div class="splitBox" style="padding: 0 20px;">
                                 <template>
-                                    <Tree :data="treeData" :render="renderContent" class="demo-tree-render"></Tree>
+                                    <Tree :data="treeData" :render="renderContent" class="demo-tree-render" @on-select-change="treeChange"></Tree>
                                 </template>
                             </div>
                         </div>
                     </div>
                     <div slot="right" class="demo-split-pane">
-                        <div class="tableList" style="border: 1px solid #dcdee2;" :style="{height: (height-90)+'px'}">
+                        <div class="tableList" style="border: 1px solid #dcdee2;" :style="{height: (height-60)+'px'}">
                             <div class="splitTitle">部门员工</div>
                             <div class="splitBox">
-                                <DepartmentUser/>
+                                <template v-if="isUser"><DepartmentUser :id="orgId"/></template>
                             </div>
                         </div>
                     </div>
@@ -92,7 +92,7 @@ export default {
         userFuncInfo: null,
         height: window.innerHeight,
         isDetail: false,
-        isDept: false,
+        isUser: false,
         disable: false,
         isLoading: false,
         userFuncCode: {},
@@ -105,6 +105,7 @@ export default {
             "userCode": "",
             "userName": "",
         },
+        orgId: "",
         itemInfo: {
             "fullname": "",
             "id": 0,
@@ -138,6 +139,15 @@ export default {
             self.getList(true);
         },
 
+        // 根据部门查询用户
+        treeChange(e) {
+            var self = this;
+            self.isUser = false;
+            setTimeout(()=>{
+                self.orgId = e[0]["id"];
+                self.isUser = true;
+            }, 200);
+        },
         // 获取用户列表
         getList(bool){
             var self = this;
@@ -193,8 +203,6 @@ export default {
                 }
 
                 self.treeData = setTreeData(self.realTimeDataList);
-
-                console.log(self.treeData);
 
                 if(res.data.code=='0') {
                     self.realTimeDataList = res.data.list;
@@ -548,6 +556,7 @@ export default {
         self.userFuncCode = self.$utility.getSessionStorage("userFuncCode");
         
         self.getList(true);
+        self.isUser = true;
 
         self.$watch('searchInfo', function () {
             clearTimeout(userTimeOut);
