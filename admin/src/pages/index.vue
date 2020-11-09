@@ -171,7 +171,7 @@ export default {
                     self.$utility.cleanLocalStorage();
                     window.parent.location.replace("#/login");
                 } else {
-                    self.$Message.error(res.data.message);
+                    self.$Message.error(res.data.msg);
                 }
             })
             .catch(function (error) {
@@ -207,7 +207,7 @@ export default {
                     self.$Message.success("密码修改成功,请重新登录");
                     self.logOut();
                 } else {
-                    self.$Message.error(res.data.message);
+                    self.$Message.error(res.data.msg);
                 }
                 self.disable = false;
             })

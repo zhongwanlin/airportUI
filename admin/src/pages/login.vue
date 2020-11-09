@@ -85,7 +85,7 @@ export default {
                         name: "index"
                     });
                 } else {
-                    self.$Message.error(res.data.message);
+                    self.$Message.error(res.data.msg);
                 }
                 self.loading = false;
             })

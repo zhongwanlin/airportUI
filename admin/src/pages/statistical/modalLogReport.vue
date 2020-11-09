@@ -185,7 +185,7 @@ export default {
                 } else if(res.data.code=='9003') {
                     self.utility.loginTimeOut(self);
                 } else {
-                    self.$Message.error(res.data.message);
+                    self.$Message.error(res.data.msg);
                 }
                 self.isLoading = false;
             })
@@ -230,7 +230,7 @@ export default {
 			    } else if(res.data.code=='9003') {
 			        self.utility.loginTimeOut(self);
 			    } else {
-			        self.$Message.error(res.data.message);
+			        self.$Message.error(res.data.msg);
 			    }
 			    self.isLoading = false;
 			})

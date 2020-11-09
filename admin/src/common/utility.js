@@ -439,7 +439,7 @@ var utility = (function (utility) {
 				self[type]["paraDeptIds"] = arr.reverse();
 				console.log(self[type][value]);
 			} else {
-				self.$Message.error(res.data.message);
+				self.$Message.error(res.data.msg);
 			}
 		})
 		.catch(function (error) {
