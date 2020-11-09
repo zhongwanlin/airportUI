@@ -106,6 +106,14 @@ const routes = [{
 
   //#region 系统管理
   {
+    name: "arganization",
+    path: "/arganization",
+    component: () => import("./pages/system/arganization.vue"),
+    meta: {
+      title: "组织架构"
+    }
+  },
+  {
     name: "roleManage",
     path: "/roleManage",
     component: () => import("./pages/system/roleManage.vue"),

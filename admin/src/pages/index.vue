@@ -43,7 +43,7 @@
         <div class="mainNavTab">
             <template>
                 <Tabs v-model="currentId" type="card" @on-click="setParent" @on-tab-remove="removeTab" :animated="false">
-                    <TabPane class="firstTab" label="用户使用报表" name="userReport">
+                    <TabPane class="firstTab" label="旅客使用报表" name="userReport">
                         <iframe :style="{width: '100%', height: (height-100) + 'px'}" src="#/userReport" frameborder="0"></iframe>
                     </TabPane>
                     <template v-for="(value, key) in iframeUrlList">
@@ -159,24 +159,24 @@ export default {
         // 退出
         logOut() {
             var self = this;
-            self.$utility.cleanLocalStorage();
-            window.parent.location.replace("#/login");
-
-            // self.axios({
-            //     method: 'post',
-            //     url: self.$config.action.userLogout,
-            // })
-            // .then(function (res) {
-            //     if(res.data.code=='0') {
-            //         self.$utility.cleanLocalStorage();
-            //         window.parent.location.replace("#/login");
-            //     } else {
-            //         self.$Message.error(res.data.message);
-            //     }
-            // })
-            // .catch(function (error) {
-            //     console.log(error);
-            // });
+            self.axios({
+                method: 'post',
+                headers: {
+                    token: self.userInfo.token
+                },
+                url: self.$config.action.userLoginOut,
+            })
+            .then(function (res) {
+                if(res.data.code=='0') {
+                    self.$utility.cleanLocalStorage();
+                    window.parent.location.replace("#/login");
+                } else {
+                    self.$Message.error(res.data.message);
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
         },
         saveAction(){
             var self = this;
@@ -229,7 +229,7 @@ export default {
 
         self.menuList = menu.setMenuList(self)["menuInfo"];
 
-        console.log(self.menuList);
+        console.log(self.userInfo);
     },
     mounted(){
         let self = this;

@@ -5,9 +5,14 @@
                 <table>
                     <tr>
                         <td>
+                            &nbsp;&nbsp;部门:
+                            <template>
+                                <div style="display: inline-block;"><Cascader :data="treeData" v-model="searchInfo.orgids" style="width:400px;"></Cascader></div>
+                            </template>
+                            
                             &nbsp;&nbsp;用户名:
                             <template>
-                                <Input v-model="searchInfo.userName" clearable placeholder="请输入用户名" style="width:100px;"/>
+                                <Input v-model="searchInfo.userName" clearable placeholder="请输入用户名" style="width:200px;"/>
                             </template>
                             <template>
                                 <div class="searchBtnList">
@@ -26,8 +31,8 @@
                 <Table :height="height-100" border stripe :loading="isLoading" :columns="columnsRealTime" :data="realTimeDataList">
                     <template slot-scope="{ row, index }" slot="action">
                         <Button type="primary" size="small" @click="showEdit(row)">修改</Button>&nbsp;&nbsp;
-                        <!-- <Button type="error" size="small" @click="deleteAction(row)">删除</Button> -->
                     </template>
+
                     <template slot-scope="{ row, index }" slot="status">
                         <template>
                             <i-switch size="large" :value="row.status" :true-value="1" :false-value="0" @on-change="enableOrNot(row.status==0?'1':'0', row)">
@@ -36,6 +41,7 @@
                             </i-switch>
                         </template>
                     </template>
+                    
                 </Table>
             </template>
         </div>
@@ -50,6 +56,12 @@
                 <div class="modalTable">
                     <div class="detail" :style="{maxHeight: (height-200)+'px',overflowY: 'auto'}">
                         <table>
+                            <tr>
+                                <td>
+                                    <span class="request">*</span>所在部门：
+                                    <div><Cascader :data="treeData" v-model="itemInfo.orgids"></Cascader></div>
+                                </td>
+                            </tr>
                             <tr>
                                 <td>
                                     <span class="request">*</span>用户名：
@@ -159,6 +171,8 @@ export default {
         searchInfo: {
             "userCode": "",
             "userName": "",
+            "orgid": "",
+            "orgids": [],
         },
         itemInfo: {
             "id": "",
@@ -167,7 +181,8 @@ export default {
             "nickname": "",
             "password": "",
             "username": "",
-            "orgid": 0,
+            "orgid": "",
+            "orgids": [],
         },
         columnsRealTime: [
             {
@@ -220,7 +235,8 @@ export default {
             }
         ],
         realTimeDataList: [],
-        roleList: []
+        roleList: [],
+        treeData: []
     }),
     methods: {
         pageSizeChange(value) {
@@ -250,7 +266,8 @@ export default {
                 url: self.$config.action.userList,
                 params: {
                     "pageNum": self.pageInfo.pageIndex,
-                    "pageSize": self.pageInfo.pageSize
+                    "pageSize": self.pageInfo.pageSize,
+                    "orgid": self.searchInfo.orgids[self.searchInfo.orgids.length-1],
                 }
             })
             .then(function (res) {
@@ -280,17 +297,28 @@ export default {
                 "nickname": "",
                 "password": "",
                 "username": "",
-                "orgid": 0,
+                "orgids": [],
+                "orgid": "",
             };
             self.isDetail = true;
         },
         // 显示编辑
         showEdit(item){
             let self = this;
+            let arr = [];
             for(var key in item) {
                 self.itemInfo[key] = item[key];
             }
+            self.itemInfo.orgids = [];
             self.isDetail = true;
+
+            if(self.itemInfo.orgid>=0) {
+                self.$utility.setDepetList(self.treeData, self.itemInfo.orgid, arr);
+                console.log(arr);
+                arr[0].split(",").forEach((item)=>{
+                    self.itemInfo.orgids.push(parseInt(item, 10));
+                });
+            }
         },
         // 显示详情
         showInfo(item){
@@ -321,6 +349,9 @@ export default {
             self.disable = true;
             self.axios({
                 method: 'post',
+                headers: {
+                    token: self.userInfo.token
+                },
                 url: !self.itemInfo.id?self.$config.action.userAdd:self.$config.action.userEdit,
                 data: {
                     "id": self.itemInfo.id||"", 
@@ -329,7 +360,7 @@ export default {
                     "nickname": self.itemInfo.nickname,
                     "password": md5(self.itemInfo.password),
                     "username": self.itemInfo.username,
-                    "orgid": self.itemInfo.orgid,
+                    "orgid": self.itemInfo.orgids[self.itemInfo.orgids.length-1],
                 }
             })
             .then(function (res) {
@@ -344,7 +375,8 @@ export default {
                         "nickname": "",
                         "password": "",
                         "username": "",
-                        "orgid": ""
+                        "orgids": [],
+                        "orgid": "",
                     };
                 } else if(res.data.code=='9003') {
                     self.utility.loginTimeOut(self);
@@ -366,6 +398,9 @@ export default {
                 onOk() {
                     self.axios({
                         method: 'post',
+                        headers: {
+                            token: self.userInfo.token
+                        },
                         url: self.$config.action.userDelete,
                         data: {
                             "id": item.id,
@@ -419,6 +454,9 @@ export default {
             var self = this;
             self.axios({
                 method: 'get',
+                headers: {
+                    token: self.userInfo.token
+                },
                 url: self.$config.action.roleList,
                 params: {
                     "pageNum": 1,
@@ -438,7 +476,50 @@ export default {
             .catch(function (error) {
                 console.log(error);
             });
-        }
+        },
+        // 获取用户列表
+        getDepetList(bool){
+            var self = this;
+            self.axios({
+                method: 'get',
+                headers: {
+                    token: self.userInfo.token
+                },
+                url: self.$config.action.orgList,
+                params: {
+                    "pageNum": 1,
+                    "pageSize": 10000
+                }
+            })
+            .then(function (res) {
+                let depetArr = [];
+                let arr = [];
+                self.realTimeDataList = res.data.list;
+                self.count = res.data.total;
+                self.treeData = [];
+
+                self.realTimeDataList.forEach((item,index)=>{
+                    self.realTimeDataList[index]["label"] = item.name;
+                    self.realTimeDataList[index]["value"] = item.id;
+                });
+
+                //第一种： filter 方式
+                function setTreeData(source){
+                    let cloneData = source;     // 对源数据深度克隆
+                    return  cloneData.filter(father=>{                      // 循环所有项，并添加children属性
+                        let branchArr = cloneData.filter(child=>father.id == child.pid);       // 返回每一项的子级数组
+                        branchArr.length>0 ? father.children=branchArr : []   //给父级添加一个children属性，并赋值
+                        return father.pid==0;      //返回第一层
+                    });
+                }
+                self.treeData = setTreeData(self.realTimeDataList);
+                self.isLoading = false;
+            })
+            .catch(function (error) {
+                console.log(error);
+                self.isLoading = false;
+            });
+        },
     },
     created() {
         let self = this;
@@ -448,8 +529,8 @@ export default {
         self.userFuncCode = self.$utility.getSessionStorage("userFuncCode");
         
         self.getList(true);
-
         self.getRoleList();
+        self.getDepetList();
 
         self.$watch('searchInfo', function () {
             clearTimeout(userTimeOut);
@@ -471,7 +552,7 @@ export default {
         };
     },
     beforeDestroy(){
-        clearInterval(window.recordTime);
+
     }
 };
 </script>

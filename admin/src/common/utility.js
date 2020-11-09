@@ -388,6 +388,18 @@ var utility = (function (utility) {
 		// }, 3000);
 	};
 
+	utility.setDepetList = function(list, value, arr) {
+		if(!!list && list.length > 0) {
+			for(var i = 0, len = list.length; i < len; i++) {
+				if(list[i].value == value) {
+					arr.push(list[i]["__value"]);
+				} else {
+					utility.setDepetList(list[i]["children"], value, arr);
+				}
+			}
+		}
+	};
+
 	// 把部门设置成树状结构
 	utility.getSuperiorDepartmentList = function(self, type, value){
 		let formatSuperiorDeprt = function(list) {

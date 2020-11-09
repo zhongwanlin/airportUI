@@ -13,7 +13,7 @@
                             </template>
                             &nbsp;&nbsp;时间
                             <template>
-                                <DatePicker type="daterang" clearable :options="dataPickOption" @on-change="setBeginTime" placeholder="请选择时间" style="width: 120px"></DatePicker>
+                                <DatePicker type="daterange" clearable :options="dataPickOption" @on-change="setBeginTime" placeholder="请选择时间" style="width: 220px"></DatePicker>
                             </template>
 							&nbsp;&nbsp;设备号
 							<template>
@@ -231,14 +231,14 @@ export default {
 
         // self.getLostCustomerEvaluationList(true);
 
-        self.$watch('searchInfo', function () {
-            clearTimeout(userTimeOut);
-            userTimeOut = setTimeout(() => {
-                self.getLostCustomerEvaluationList(true);
-            }, 200);
-        }, {
-            deep: true
-        });
+        // self.$watch('searchInfo', function () {
+        //     clearTimeout(userTimeOut);
+        //     userTimeOut = setTimeout(() => {
+        //         self.getLostCustomerEvaluationList(true);
+        //     }, 200);
+        // }, {
+        //     deep: true
+        // });
     },
     mounted() {
         let self = this;

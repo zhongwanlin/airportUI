@@ -15,6 +15,7 @@ const config = (function (config) {
 
 		// 用户
 		"userLogin": config.hostName+"/sys/user/login", //用户登录
+		"userLoginOut": config.hostName+"/sys/user/loginOut", //退出登录
 		"userList": config.hostName+"/sys/user/list", //用户列表
 		"userAdd": config.hostName+"/sys/user/add", //用户新增
 		"userEdit": config.hostName+"/sys/user/edit", //用户修改
@@ -29,6 +30,24 @@ const config = (function (config) {
 		"roleDelete": config.hostName+"/sys/role/delete", //删除角色
 		"roleDisable": config.hostName+"/sys/role/disable", //禁用角色
 		"roleEnable": config.hostName+"/sys/role/enable", //启用角色
+
+		// 组织架构
+		"orgAdd": config.hostName+"/sys/org/add", // 新增组织架构
+		"orgEdit": config.hostName+"/sys/org/edit", // 编辑组织架构
+		"orgDelete": config.hostName+"/sys/org/delete", // 编辑组织架构
+		"orgList": config.hostName+"/sys/org/list", // 组织架构列表
+
+		// 区域
+		"areaList": config.hostName+"/sys/area/list", // 区域列表
+		"areaAdd": config.hostName+"/sys/area/add", // 新增区域
+		"areaEdit": config.hostName+"/sys/area/edit", // 修改区域
+		"areaDelete": config.hostName+"/sys/area/delete", // 删除区域
+
+		// 设备
+		"marchineList": config.hostName+"/sys/machine/list", // 区域列表
+		"marchineAdd": config.hostName+"/sys/machine/add", // 新增区域
+		"marchineEdit": config.hostName+"/sys/machine/edit", // 修改区域
+		"marchineDelete": config.hostName+"/sys/machine/delete", // 删除区域
 
 	};
 
