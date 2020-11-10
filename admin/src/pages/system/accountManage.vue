@@ -117,8 +117,15 @@
                                     头像：
                                     <div>
                                         <template>
-                                            <Upload action="//jsonplaceholder.typicode.com/posts/">
-                                                <Button icon="ios-cloud-upload-outline">上传单张图片</Button>
+                                            <Upload
+                                            :headers="{token: userInfo.token}" 
+                                            :action="$config.action.setFileUpload"
+                                            :disabled="disable"
+                                             :show-upload-list="false" 
+                                             :on-error="errorUpload" 
+                                             :on-progress="progressing" 
+                                             :on-success="uploadSuccess">
+                                                <Button icon="ios-cloud-upload-outline">上传更新包</Button>
                                             </Upload>
                                         </template>
                                     </div>
@@ -519,6 +526,32 @@ export default {
                 console.log(error);
                 self.isLoading = false;
             });
+        },
+
+        // 文件上传中
+        progressing(){
+            let self = this;
+            self.disabled = true;
+        },
+        // 上传失败
+        errorUpload(error){
+            let self = this;
+            self.disabled = false;
+            console.log(error);
+        },
+        // 
+        uploadSuccess(response, file, fileList){
+            let self = this;
+            self.disabled = false;
+            if(!!response.data&&response.data.length>0) {
+                console.log(response, file, fileList);
+            } else {
+                self.$Message.info({
+                    content: response.message,
+                    duration: 0,
+                    closable: true
+                });
+            }
         },
     },
     created() {

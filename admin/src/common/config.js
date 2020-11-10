@@ -55,6 +55,16 @@ const config = (function (config) {
 		"configEdit": config.hostName+"/sys/config/edit", // 修改参数
 		"configDelete": config.hostName+"/sys/config/delete", // 删除参数
 
+		// 版本管理
+		"versionList": config.hostName+"/sys/version/list", // 版本列表
+		"versionAdd": config.hostName+"/sys/version/add", // 新增版本
+		"versionEdit": config.hostName+"/sys/version/edit", // 修改版本
+		"versionDelete": config.hostName+"/sys/version/delete", // 删除版本
+		"versionGet": config.hostName+"/sys/version/get", // 版本详情
+
+		// 文件上传
+		"setFileUpload": config.hostName+"/upload/setFileUpload", //文件上传
+
 	};
 
 	return config;

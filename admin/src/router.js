@@ -150,6 +150,17 @@ const routes = [{
   },
   //#endregion
 
+  //#region 紧急预案
+  {
+    name: "emergency",
+    path: "/emergency",
+    component: () => import("./pages/emergency/index.vue"),
+    meta: {
+      title: "紧急预案"
+    }
+  },
+  //#endregion
+
   //#region 用户反馈
   {
     name: "feedbackManage",

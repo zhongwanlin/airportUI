@@ -2,7 +2,7 @@
     <div>
         <div class="tableList">
             <template>
-                <Table :height="height-200" border stripe :loading="isLoading" :columns="columnsRealTime" :data="realTimeDataList"></Table>
+                <Table :height="height-160" border stripe :loading="isLoading" :columns="columnsRealTime" :data="realTimeDataList"></Table>
             </template>
         </div>
         <div class="pageWrap">

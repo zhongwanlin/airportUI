@@ -79,7 +79,11 @@
                             <tr>
                                 <td>
                                     SDK版本：
-                                    <div><Input v-model="itemInfo.version" placeholder="填写SDK版本" style="width: 100%" /></div>
+                                    <div>
+                                        <Select v-model="itemInfo.version" placeholder="选择SDK版本" style="width:100%">
+                                            <Option v-for="item in versionList" :value="item.version" :key="item.id">{{ item.version }}</Option>
+                                        </Select>
+                                    </div>
                                 </td>
                             </tr>
                             <tr>
@@ -200,7 +204,8 @@ export default {
             }
         ],
         realTimeDataList: [],
-        areaList: []
+        areaList: [],
+        versionList: []
     }),
     methods: {
         pageSizeChange(value) {
@@ -402,6 +407,32 @@ export default {
                 self.isLoading = false;
             });
         },
+        // 获取版本
+        getVersionList(bool){
+            var self = this;
+            if (bool == true) {
+                self.isLoading = true;
+                self.pageInfo.pageIndex = 0;
+            }
+            self.axios({
+                method: 'get',
+                headers: {
+                    token: self.userInfo.token
+                },
+                url: self.$config.action.versionList,
+                params: {
+                    "pageNum": 1,
+                    "pageSize": 10000,
+                }
+            })
+            .then(function (res) {
+                self.versionList = res.data.list;
+            })
+            .catch(function (error) {
+                console.log(error);
+                self.isLoading = false;
+            });
+        },
     },
     created() {
         let self = this;
@@ -410,6 +441,7 @@ export default {
         
         self.getList(true); // 获取角色
         self.getAreaList(true); // 获取角色
+        self.getVersionList(true); // 获取版本
 
         self.$watch('searchInfo', function () {
             clearTimeout(userTimeOut);

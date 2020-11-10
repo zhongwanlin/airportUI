@@ -16,7 +16,7 @@
         </div>
 
         <div class="sibeMenu">
-            <Menu :style="{height: (height-50)+'px',width: 'auto'}" accordion  :active-name="activeName" :open-names="[openNames]">
+            <Menu :style="{height: (height-70)+'px',width: 'auto'}"  :active-name="activeName" :open-names="openNames">
                 <template v-for="(value, key) in menuList">
                     <template v-if="value.isShow">
                         <Submenu :name="value.id" :key="key+'sub'" >
@@ -106,7 +106,7 @@ export default {
         isModifPass: false,
         disable: false,
         activeName: "statisticalReport",
-        openNames: "statisticalReport",
+        openNames: ["statisticalReport","sysAdmin","areaManage","deviceManage","voiceManage","emergency","statisticalReport"],
         modifiInfo: {
             oldUserPwd: "",
             newUserPwd: "",
@@ -315,8 +315,10 @@ body {
         top:64px;
         bottom: 0;
         width: 140px;
+        overflow-x: hidden;
+        overflow-y: auto;
         .ivu-menu-submenu-title {
-            padding: 12px 10px;
+            padding: 8px 10px;
             background-color: #e8eaec;
             border-bottom: 1px solid #f8f8f8;
             .label {
@@ -337,12 +339,12 @@ body {
             .item {
                 position: relative;
                 z-index: 0;
-                padding: 12px 10px;
+                padding: 8px 10px;
                 border-bottom: 1px solid #dcdcdc;
                 .topArrow {
                     position: absolute;
                     z-index: 100;
-                    top: 13px;
+                    top: 8px;
                     right: 14px;
                 }
             }
