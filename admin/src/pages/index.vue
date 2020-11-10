@@ -1,7 +1,10 @@
 <template>
     <div id="index">
         <div class="topHeader">
-            <div class="logo">首都机场大屏后台管理系统</div>
+            <div class="logo">
+                <img style="" src="/assets/logo.png"/>
+                <!-- <span class="label">首都机场大屏后台管理系统</span> -->
+            </div>
             <div class="user">
                 <span class="info">{{!!userInfo?userInfo.nickname:''}}（{{!!userInfo?userInfo.username:''}}）</span>
                 <span class="info logOut" @click="logOut">退出 <span><Icon type="md-exit" size="24" /></span></span>
@@ -383,8 +386,7 @@ body {
             color: #fff;
             font-size: 20px;
             img {
-                width: 100%;
-                height: 100%;
+                
             }
         }
         // .mainNav {
