@@ -54,7 +54,7 @@
         <template>
             <Modal v-model="isDetail" class="noContentPadding noHeaderModal" :mask-closable="false" width="30" :styles="{top: '5%'}" title="新增/修改账号" @on-cancel="isDetail=false">
                 <div class="modalTable">
-                    <div class="detail" :style="{maxHeight: (height-200)+'px',overflowY: 'auto'}">
+                    <div class="detail" :style="{maxHeight: (height-100)+'px',overflowY: 'auto'}">
                         <table>
                             <tr>
                                 <td>
@@ -80,7 +80,7 @@
                             <tr>
                                 <td>
                                     <span class="request">*</span>密码：
-                                    <div><Input v-model="itemInfo.password" placeholder="填写登录密码,至少6个字符,最多18个字符" style="width: 100%" /></div>
+                                    <div><Input v-model="newPassword" placeholder="填写登录密码,至少6个字符,最多18个字符" style="width: 100%" /></div>
                                     <div class="tips">必填，至少6个字符,最多18个字符</div>
                                 </td>
                             </tr>
@@ -90,7 +90,7 @@
                                     <span class="request">*</span>角色：
                                     <div>
                                         <template>
-                                            <Select v-model="itemInfo.roleId" clearable placeholder="选择角色" style="width: 100%;">
+                                            <Select v-model="itemInfo.role" clearable placeholder="选择角色" style="width: 100%;">
                                                 <template v-for="(item, index) in roleList">
                                                     <Option :value="item.id" :key="index">{{item.name}}</Option>
                                                 </template>
@@ -125,7 +125,7 @@
                                              :on-error="errorUpload" 
                                              :on-progress="progressing" 
                                              :on-success="uploadSuccess">
-                                                <Button icon="ios-cloud-upload-outline">上传更新包</Button>
+                                                <Button icon="ios-cloud-upload-outline">上传头像</Button>
                                             </Upload>
                                         </template>
                                     </div>
@@ -185,12 +185,14 @@ export default {
             "id": "",
             "email": "",
             "mobile": "",
+            "role": "",
             "nickname": "",
             "password": "",
             "username": "",
             "orgid": "",
             "orgids": [],
         },
+        newPassword: "",
         columnsRealTime: [
             {
                 align: "center",
@@ -347,7 +349,7 @@ export default {
             
             // 新增是秘密必传
             if(!self.itemInfo.id){
-                if(self.itemInfo.password.trim().length<6||self.itemInfo.password.trim().length>18) {
+                if(self.newPassword.trim().length<6||self.newPassword.trim().length>18) {
                     self.$Message.error("登录密码至少6到18位字符");
                     return;
                 }
@@ -364,8 +366,9 @@ export default {
                     "id": self.itemInfo.id||"", 
                     "email": self.itemInfo.email,
                     "mobile": self.itemInfo.mobile,
+                    "role": self.itemInfo.role,
                     "nickname": self.itemInfo.nickname,
-                    "password": md5(self.itemInfo.password),
+                    "password": !!self.newPassword?md5(self.newPassword):"",
                     "username": self.itemInfo.username,
                     "orgid": self.itemInfo.orgids[self.itemInfo.orgids.length-1],
                 }

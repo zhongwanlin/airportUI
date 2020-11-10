@@ -181,6 +181,11 @@ export default {
                 key: "mac_id",
             },
             {
+                title: "SDK版本",
+                align: "center",
+                key: "version",
+            },
+            {
                 title: "部署状态",
                 align: "center",
                 key: "dep_status",
