@@ -31,7 +31,7 @@
         </div>
 
         <template>
-            <Modal v-model="isDetail" class="noContentPadding noHeaderModal" :mask-closable="false" width="30" :styles="{top: '5%'}" title="新增/修改账号" @on-cancel="isDetail=false">
+            <Modal v-model="isDetail" class="noContentPadding noHeaderModal" :mask-closable="false" width="30" :styles="{top: '5%'}" title="新增/修改账号" @on-cancel="hideModal">
                 <div class="modalTable">
                     <div class="detail" :style="{maxHeight: (height-200)+'px',overflowY: 'auto'}">
                         <table>
@@ -46,7 +46,7 @@
                 </div>
                 <div slot="footer" class="modalFooter">
                     <template>
-                        <Button type="default" @click="isDetail=false" style="margin-right: 5px">关闭</Button>
+                        <Button type="default" @click="hideModal" style="margin-right: 5px">关闭</Button>
                         <Button type="primary" @click="saveAction" :disabled="disable">提交</Button>
                     </template>
                 </div>
@@ -54,7 +54,7 @@
         </template>
 
         <template>
-            <Modal v-model="isDept" class="noContentPadding noHeaderModal" :mask-closable="false" width="30" :styles="{top: '5%'}" title="新增/修改账号" @on-cancel="isDept=false">
+            <Modal v-model="isDept" class="noContentPadding noHeaderModal" :mask-closable="false" width="30" :styles="{top: '5%'}" title="新增/修改账号" @on-cancel="hideModal">
                 <div class="modalTable">
                     <div class="detail" :style="{maxHeight: (height-200)+'px',overflowY: 'auto'}">
                         <table>
@@ -69,7 +69,7 @@
                 </div>
                 <div slot="footer" class="modalFooter">
                     <template>
-                        <Button type="default" @click="isDept=false" style="margin-right: 5px">关闭</Button>
+                        <Button type="default" @click="hideModal" style="margin-right: 5px">关闭</Button>
                         <Button type="primary" @click="saveDepetAction" :disabled="disable">提交</Button>
                     </template>
                 </div>
@@ -92,6 +92,7 @@ export default {
         userFuncInfo: null,
         height: window.innerHeight,
         isDetail: false,
+        isDept: false,
         isUser: false,
         disable: false,
         isLoading: false,
@@ -137,6 +138,11 @@ export default {
         reflesh(){
             var self = this;
             self.getList(true);
+        },
+        hideModal(){
+            var self = this;
+            self.isDetail = false;
+            self.isDept = false;
         },
 
         // 根据部门查询用户
@@ -414,7 +420,7 @@ export default {
                         on: {
                             click: () => { window.vuePage.append(data) }
                         }
-                    },'+下级部门'),
+                    },'+'),
                     h('Button', {
                         props: Object.assign({},{
                             type: 'default',
@@ -482,7 +488,7 @@ export default {
                         on: {
                             click: () => { window.vuePage.append(data) }
                         }
-                    }, "+新增部门"),
+                    }, "+"),
                     h('Button', {
                         props: Object.assign({},{
                             type: 'warning',

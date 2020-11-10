@@ -49,6 +49,12 @@ const config = (function (config) {
 		"marchineEdit": config.hostName+"/sys/machine/edit", // 修改区域
 		"marchineDelete": config.hostName+"/sys/machine/delete", // 删除区域
 
+		// 参数配置
+		"configList": config.hostName+"/sys/config/list", // 参数列表
+		"configAdd": config.hostName+"/sys/config/add", // 新增参数
+		"configEdit": config.hostName+"/sys/config/edit", // 修改参数
+		"configDelete": config.hostName+"/sys/config/delete", // 删除参数
+
 	};
 
 	return config;
