@@ -112,7 +112,7 @@
                                     <div><Input v-model="itemInfo.email" placeholder="常用邮箱" style="width: 100%" /></div>
                                 </td>
                             </tr>
-                            <tr>
+                            <!-- <tr>
                                 <td>
                                     头像：
                                     <div>
@@ -130,7 +130,7 @@
                                         </template>
                                     </div>
                                 </td>
-                            </tr>
+                            </tr> -->
                             <!-- <tr>
                                 <td>
                                     <span class="request">*</span>帐号状态：

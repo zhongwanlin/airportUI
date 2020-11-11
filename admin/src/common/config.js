@@ -61,9 +61,11 @@ const config = (function (config) {
 		"versionEdit": config.hostName+"/sys/version/edit", // 修改版本
 		"versionDelete": config.hostName+"/sys/version/delete", // 删除版本
 		"versionGet": config.hostName+"/sys/version/get", // 版本详情
+		"versionEnable": config.hostName+"/sys/version/enable", // 启用版本
+		"versionDisable": config.hostName+"/sys/version/disable", // 禁用版本
 
 		// 文件上传
-		"setFileUpload": config.hostName+"/upload/setFileUpload", //文件上传
+		"setFileUpload": config.hostName+"/upload/file", //文件上传
 
 	};
 

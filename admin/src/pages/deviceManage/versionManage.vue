@@ -32,6 +32,10 @@
                             </i-switch>
                         </template>
                     </template>
+                    <template slot-scope="{ row, index }" slot="action">
+                        <Button type="primary" size="small" @click="showEdit(row)">修改</Button>&nbsp;&nbsp;
+                        <Button type="error" size="small" @click="deleteAction(row)">删除</Button>
+                    </template>
                 </Table>
             </template>
         </div>
@@ -50,19 +54,19 @@
                             <tr>
                                 <td>
                                     <span class="request">*</span>版本号：
-                                    <div><Input v-model="itemInfo.name" placeholder="填写版本号" style="width: 100%" /></div>
+                                    <div><Input v-model="itemInfo.version" placeholder="填写版本号" style="width: 100%" /></div>
                                 </td>
                             </tr>
                             <tr>
                                 <td>
                                     <span class="request">*</span>版本描述：
-                                    <div><Input v-model="itemInfo.title" placeholder="填写配置用途" style="width: 100%" /></div>
+                                    <div><Input v-model="itemInfo.info" placeholder="填写版本描述" style="width: 100%" /></div>
                                 </td>
                             </tr>
                             <tr>
                                 <td>
-                                    <span class="request">*</span>更新时间：
-                                    <div><Input v-model="itemInfo.value" placeholder="填写配置值" style="width: 100%" /></div>
+                                    <span class="request">*</span>更新包MD5：
+                                    <div><Input v-model="itemInfo.md5" placeholder="填写更新包MD5" style="width: 100%" /></div>
                                 </td>
                             </tr>
                             <tr>
@@ -74,7 +78,7 @@
                                             :headers="{token: userInfo.token}" 
                                             :action="$config.action.setFileUpload"
                                             :disabled="disable"
-                                             :show-upload-list="false" 
+                                             :show-upload-list="isShowUploadList" 
                                              :on-error="errorUpload" 
                                              :on-progress="progressing" 
                                              :on-success="uploadSuccess">
@@ -82,6 +86,7 @@
                                             </Upload>
                                         </template>
                                     </div>
+                                    <div>{{itemInfo.url}}</div>
                                 </td>
                             </tr>
                             
@@ -114,6 +119,7 @@ export default {
         isInfo: false,
         disable: false,
         isLoading: false,
+        isShowUploadList: false,
         count: 0,
         pageInfo: {
             pageIndex: 0,
@@ -167,9 +173,15 @@ export default {
             },
             {
                 align: "center",
-                title: "操作",
+                title: "状态",
                 width: 120,
                 slot: 'status'
+            },
+            {
+                align: "center",
+                title: "操作",
+                width: 120,
+                slot: 'action'
             }
         ],
         realTimeDataList: []
@@ -225,10 +237,10 @@ export default {
             let self = this;
             self.itemInfo = {
                 "id": 0,
-                "name": "",
-                "tips": "",
-                "title": "",
-                "value": ""
+                "info": "",
+                "md5": "",
+                "url": "",
+                "version": ""
             };
             self.isDetail = true;
         },
@@ -252,23 +264,18 @@ export default {
         saveAction(){
             let self = this;
             
-            if(self.itemInfo.name.trim().length==0) {
-                self.$Message.error("请输入配置名称");
+            if(self.itemInfo.version.trim().length==0) {
+                self.$Message.error("请输入版本号");
                 return;
             }
 
-            if(self.itemInfo.title.trim().length==0) {
-                self.$Message.error("请输入配置用途");
+            if(self.itemInfo.info.trim().length==0) {
+                self.$Message.error("请输入版本描述");
                 return;
             }
 
-            if(self.itemInfo.value.trim().length==0) {
-                self.$Message.error("请输入配置值");
-                return;
-            }
-
-            if(self.itemInfo.tips.trim().length==0) {
-                self.$Message.error("请输入配置描述");
+            if(self.itemInfo.url.trim().length==0) {
+                self.$Message.error("请上传更新包");
                 return;
             }
             
@@ -278,13 +285,13 @@ export default {
                 headers: {
                     token: self.userInfo.token
                 },
-                url: !self.itemInfo.id?self.$config.action.configAdd:self.$config.action.configEdit,
+                url: !self.itemInfo.id?self.$config.action.versionAdd:self.$config.action.versionEdit,
                 data: {
                     "id": self.itemInfo.id || 0, 
-                    "name": self.itemInfo.name,
-                    "tips": self.itemInfo.tips,
-                    "title": self.itemInfo.title,
-                    "value": self.itemInfo.value
+                    "info": self.itemInfo.info,
+                    "md5": self.itemInfo.md5,
+                    "url": self.itemInfo.url,
+                    "version": self.itemInfo.version
                 }
             })
             .then(function (res) {
@@ -292,12 +299,13 @@ export default {
                     self.$Message.success("提交成功");
                     self.getList(false);
                     self.isDetail = false;
+                    self.isShowUploadList = false;
                     self.itemInfo = {
                         "id": 0,
-                        "name": "",
-                        "tips": "",
-                        "title": "",
-                        "value": ""
+                        "info": "",
+                        "md5": "",
+                        "url": "",
+                        "version": ""
                     };
                 } else if(res.data.code=='9003') {
                     self.utility.loginTimeOut(self);
@@ -309,6 +317,7 @@ export default {
             .catch(function (error) {
                 console.log(error);
                 self.disable = false;
+                self.isShowUploadList = false;
             });
         },
         // 删除公司
@@ -351,7 +360,7 @@ export default {
                 headers: {
                     token: self.userInfo.token
                 },
-                url: value==1?self.$config.action.userEnable:self.$config.action.userDisable,
+                url: value==1?self.$config.action.versionEnable:self.$config.action.versionDisable,
                 data: {
                     "id": row.id
                 }
@@ -387,6 +396,8 @@ export default {
             self.disabled = false;
             if(!!response.data&&response.data.length>0) {
                 console.log(response, file, fileList);
+                self.itemInfo.url = self.$config.imgPath+response.data;
+                self.isShowUploadList = true;
             } else {
                 console.log(response, file, fileList);
                 self.$Message.error({
