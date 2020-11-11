@@ -15,13 +15,13 @@
                             </template>
                             &nbsp;&nbsp;区域
                             <template>
-                                <Select v-model="searchInfo.area_id" style="width:200px">
+                                <Select v-model="searchInfo.area_id" clearable style="width:200px">
                                     <Option v-for="item in areaList" :value="item.id" :key="item.id">{{ item.name }}</Option>
                                 </Select>
                             </template>
                             &nbsp;&nbsp;部署状态
                             <template>
-                                <Select v-model="searchInfo.dep_status" style="width:200px">
+                                <Select v-model="searchInfo.dep_status" clearable style="width:200px">
                                     <!-- 1:入场，2：撤场，3激活 -->
                                     <Option :value="1">入场</Option>
                                     <Option :value="2">撤场</Option>

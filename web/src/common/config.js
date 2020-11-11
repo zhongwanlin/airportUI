@@ -1,25 +1,28 @@
 const config = (function (config) {
-	//开发环境、测试环境
-	console.log(window.location.host);
+	config.imgPath = "http://47.106.235.8:8888/";
+	config.assets = "http://47.106.235.8:8888/assets/";
+	// 测试环境
 	if (process.env.NODE_ENV === 'development') {
-		config.host = "http://" + window.location.host;
-	} else {
-		config.host = "http://" + window.location.host;
+		config.hostName = "http://47.106.235.8:8888";
+		console.log("development");
+	} else if (process.env.NODE_ENV === 'production') {
+		config.hostName = "http://47.106.235.8:8888";
+		console.log("production");
 	}
-
-	config.static = config.host + "/terminal/static/";
 
 	//接口动作
 	config.action = {
-		"getColumns": config.host + "/api/Airport_Service/column",
-		"getArticle": config.host + "/api/Airport_Service/article",
-		"getArticleList": config.host + "/api/Airport_Service/articleList",
-		"getLogWrite": config.host + "/api/log/write",
-		"comment": config.host + "/api/Comment", // web-反馈
-		"faceSearch": config.host + "/api/Face/search", // web-人脸识别
-		"map": config.host + "/api/Map", // web-获取导航图
-		"asp": config.host + "/api/Asp", // 终端-语音识别
-		"writeLog": config.host + "/api/log/write", // 终端-调用模块记录
+		"getColumns": config.hostName + "/api/Airport_Service/column",
+		"getArticle": config.hostName + "/api/Airport_Service/article",
+		"getArticleList": config.hostName + "/api/Airport_Service/articleList",
+		"getLogWrite": config.hostName + "/api/log/write",
+		"comment": config.hostName + "/api/Comment", // web-反馈
+		"faceSearch": config.hostName + "/api/Face/search", // web-人脸识别
+		"map": config.hostName + "/api/Map", // web-获取导航图
+		"asp": config.hostName + "/api/Asp", // 终端-语音识别
+		"writeLog": config.hostName + "/api/log/write", // 终端-调用模块记录
+
+		"emergencyList": config.hostName+"/sys/emergency/list", // 版本列表
 	};
 
 	// 航空公司

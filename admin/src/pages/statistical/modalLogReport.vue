@@ -5,25 +5,18 @@
                 <table>
                     <tr>
                         <td>
-                            区域
+                            
+                            &nbsp;&nbsp;区域
                             <template>
-                                <Select v-model="searchInfo.satisfiedFlag" clearable placeholder="选择是否满意" style="width: 120px;">
-                                    <Option :value="1">满意</Option>
-                                    <Option :value="2">不满意</Option>
+                                <Select v-model="searchInfo.area_name" clearable style="width:200px">
+                                    <Option v-for="item in areaList" :value="item.name" :key="item.id">{{ item.name }}</Option>
                                 </Select>
                             </template>
-                            &nbsp;&nbsp;时间
+                            &nbsp;&nbsp;设备号
                             <template>
-                                <DatePicker type="daterang" clearable :options="dataPickOption" @on-change="setBeginTime" placeholder="请选择时间" style="width: 120px"></DatePicker>
-                            </template>
-							&nbsp;&nbsp;设备号
-							<template>
-							    <Input v-model="searchInfo.roleName" clearable placeholder="请输入标题" style="width:150px;"/>
-							</template>
-                            <template>
-                                <div class="searchBtnList">
-                                    <Button icon="ios-refresh-circle" @click="reflesh(true)">刷新</Button>
-                                </div>
+                                <Select v-model="searchInfo.mac_id" clearable style="width:200px">
+                                    <Option v-for="item in marchineList" :value="item.id" :key="item.id">{{ item.mac_id }}({{ item.name }})</Option>
+                                </Select>
                             </template>
                         </td>
                     </tr>
@@ -33,7 +26,7 @@
 
         <div class="tableList">
             <template>
-                <Table :height="height-100" stripe border :loading="isLoading" :columns="columns" :data="dataList"></Table>
+                <Table :height="height-100" border stripe :loading="isLoading" :columns="columnsRealTime" :data="realTimeDataList"></Table>
             </template>
         </div>
         <div class="pageWrap">
@@ -41,152 +34,119 @@
                 <Page :total="count" @on-change="pageSizeChange" @on-page-size-change="pageRowChange" :page-size="50" :page-size-opts="[50, 100, 150]" show-sizer showTotal />
             </template>
         </div>
-		
-		
+
     </div>
 </template>
 
 <script>
 export default {
-    name: "lostAndFound",
+    name: "deviceReport",
+    components: { },
     data: () => ({
         userInfo: null,
         height: window.innerHeight,
         isLoading: false,
-        isDetail: false,
-        disable: false,
-        dateInfo: [],
         count: 0,
         pageInfo: {
-            pageIndex: 1,
+            pageIndex: 0,
             pageSize: 50,
         },
         searchInfo: {
-            satisfiedFlag: "", // 是否满意
-            beginTime: "", // 查询开始时间,yyyy-MM-dd
-            endTime: "", // 查询结束时间，yyyy-MM-dd
+            "area_name": "",
+            "begDate": "",
+            "endDate": "",
+            "mac_id": "",
+            "mac_model_id": "",
         },
-		itemInfo: {
-			id: 0, // 唯一ID，修改信息时必传
-			paraId: 0, // 要回复的评价id
-			lostRegId: 0, // 报失记录id
-			lostUserName: "",  // 旅客名称
-			userPhone: "", //旅客电话 
-			lostUserId: "", 
-			serviceLevel: "", 
-			satisfiedFlag: "", 
-			clientSuggestion: "", 
-			replyInfo: "", 
-			modifyUserId: "", 
-		},
-        columns: [
+        columnsRealTime: [
             {
-                title: "序号",
                 align: "center",
+                title: "序号",
                 type: "index",
                 width: 60,
             },
             {
-                title: "用户或机票信息",
-                align: "center",
-                key: "lostUserName",
-            },
-            {
                 title: "终端编码",
                 align: "center",
-                key: "userPhone",
+                key: "name",
             },
             {
                 title: "终端名称",
                 align: "center",
-                key: "serviceLevel",
+                key: "e_name",
             },
             {
                 title: "模组",
                 align: "center",
-                key: "serviceLevel",
+                key: "create_time",
             },
             {
                 title: "接口名称",
                 align: "center",
-                key: "serviceLevel",
+                key: "create_time",
             },
             {
                 title: "SDK版本",
                 align: "center",
-                key: "serviceLevel",
+                key: "create_time",
             },
             {
                 title: "调用状态",
                 align: "center",
-                key: "serviceLevel",
+                key: "create_time",
             },
             {
                 title: "时间",
                 align: "center",
-                key: "serviceLevel",
-            },
-        ],
-        areaCodeList: [],
-        dataList: [],
-        dataPickOption: {
-            disabledDate (date) {
-                return date && date.valueOf() > Date.now();
+                key: "create_time",
             }
-        },
+        ],
+        realTimeDataList: [],
+        areaList: [],
+        marchineList: []
     }),
     methods: {
-		setBeginTime(value) {
-			let self = this;
-			self.searchInfo.beginTime = value;
-		},
-		setEndTime(value) {
-			let self = this;
-			self.searchInfo.endTime = value;
-		},
-        reflesh(bool){
-            let self = this;
-            self.getLostCustomerEvaluationList(bool);
-        },
         pageSizeChange(value) {
-            let self = this;
+            var self = this;
             self.pageInfo.pageIndex = parseInt(value, 10);
-            self.getLostCustomerEvaluationList(true);
+            self.getList(true);
         },
         pageRowChange(value) {
-            let self = this;
+            var self = this;
             self.pageInfo.pageSize = parseInt(value, 10);
-            self.getLostCustomerEvaluationList(false);
+            self.getList(false);
         },
-        // 获取失物
-        getLostCustomerEvaluationList(bool){
-            let self = this;
-            
-            self.isLoading = true;
+        reflesh(){
+            var self = this;
+            self.getList(true);
+        },
+
+        // 获取公司列表
+        getList(bool){
+            var self = this;
             if (bool == true) {
-                self.pageInfo.pageIndex = 1;
+                self.isLoading = true;
+                self.pageInfo.pageIndex = 0;
             }
             self.axios({
-                method: 'post',
-                headers: self.$utility.setHeader(self.$config.service.evaluationService),
-                url: self.$config.action.getLostCustomerEvaluationList,
-                data: self.$qs.stringify({
-					"pageNum": self.pageInfo.pageIndex,
-					"pageSize": self.pageInfo.pageSize,
-					"satisfiedFlag": self.searchInfo.satisfiedFlag,
-					"beginTime": self.searchInfo.beginTime,
-					"endTime": self.searchInfo.endTime,
-				})
+                method: 'get',
+                headers: {
+                    token: self.userInfo.token
+                },
+                url: self.$config.action.marchineModelSumUsed,
+                params: {
+                    "pageNum": self.pageInfo.pageIndex,
+                    "pageSize": self.pageInfo.pageSize,
+                    "area_name": self.searchInfo.area_name,
+                    "begDate": self.searchInfo.begDate,
+                    "endDate": self.searchInfo.endDate,
+                    "mac_id": self.searchInfo.mac_id,
+                    "mac_model_id": self.searchInfo.mac_model_id,
+                }
             })
             .then(function (res) {
-                if(res.data.code=='200') {
-                    self.dataList = res.data.data;
-                    self.count = res.data.count;
-                } else if(res.data.code=='9003') {
-                    self.utility.loginTimeOut(self);
-                } else {
-                    self.$Message.error(res.data.msg);
-                }
+                self.realTimeDataList = res.data.list;
+                self.count = res.data.total;
                 self.isLoading = false;
             })
             .catch(function (error) {
@@ -194,63 +154,74 @@ export default {
                 self.isLoading = false;
             });
         },
-		showNewOrEdit(row){
-			let self = this;
-			self.itemInfo = row;
-			self.isDetail = true;
-		},
-		saveLostCustomerEvaluation(){
-			let self = this;
-			if(self.itemInfo.replyInfo.trim().length == 0) {
-				self.$Message.error("请输入回复的内容");
-				return;
-			}
-			self.axios({
-			    method: 'post',
-			    headers: self.$utility.setHeader(self.$config.service.evaluationService),
-			    url: self.$config.action.saveLostCustomerEvaluation,
-			    data: self.$qs.stringify({
-					id: self.itemInfo.id||0, // 唯一ID，修改信息时必传
-					paraId: self.itemInfo.paraId||0, // 要回复的评价id
-					lostRegId: self.itemInfo.lostRegId, // 报失记录id
-					lostUserName: self.itemInfo.lostUserName, // 旅客名称
-					userPhone: self.itemInfo.userPhone, //旅客电话 
-					lostUserId: self.itemInfo.lostUserId, 
-					serviceLevel: self.itemInfo.serviceLevel, 
-					satisfiedFlag: self.itemInfo.satisfiedFlag, 
-					clientSuggestion: self.itemInfo.clientSuggestion, 
-					replyInfo: self.itemInfo.replyInfo, 
-					modifyUserId: self.userInfo.id, 
-				})
-			})
-			.then(function (res) {
-			    if(res.data.code=='200') {
-					self.getLostCustomerEvaluationList(true);
-			        self.isDetail = false;
-			    } else if(res.data.code=='9003') {
-			        self.utility.loginTimeOut(self);
-			    } else {
-			        self.$Message.error(res.data.msg);
-			    }
-			    self.isLoading = false;
-			})
-			.catch(function (error) {
-			    console.log(error);
-			    self.isLoading = false;
-			});
-		}
+        getAreaList(bool){
+            var self = this;
+            
+            self.axios({
+                method: 'get',
+                headers: {
+                    token: self.userInfo.token
+                },
+                url: self.$config.action.areaList,
+                params: {
+                    "pageNum": 1,
+                    "pageSize": 10000,
+                    "e_name": "",
+                    "name": "",
+                }
+            })
+            .then(function (res) {
+                self.areaList = res.data.list;
+                self.count = res.data.total;
+                self.isLoading = false;
+            })
+            .catch(function (error) {
+                console.log(error);
+                self.isLoading = false;
+            });
+        },
+        // 获取设备列表
+        getDeviceList(){
+            var self = this;
+            
+            self.axios({
+                method: 'get',
+                headers: {
+                    token: self.userInfo.token
+                },
+                url: self.$config.action.marchineList,
+                params: {
+                    "pageNum": 1,
+                    "pageSize": 10000,
+                    "area_id": "",
+                    "dep_status": "",
+                    "mac_id": "",
+                    "status": "",
+                    "version": "",
+                    "name": "",
+                }
+            })
+            .then(function (res) {
+                self.marchineList = res.data.list;
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        },
     },
     created() {
         let self = this;
         let userTimeOut = null;
         self.userInfo = self.$utility.getLocalStorage("userInfo");
-
-        self.getLostCustomerEvaluationList(true);
+        
+        self.getList(true); // 获取角色
+        self.getAreaList();
+        self.getDeviceList();
 
         self.$watch('searchInfo', function () {
             clearTimeout(userTimeOut);
             userTimeOut = setTimeout(() => {
-                self.getLostCustomerEvaluationList(true);
+                self.getList(true);
             }, 200);
         }, {
             deep: true

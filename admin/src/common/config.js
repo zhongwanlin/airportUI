@@ -48,6 +48,9 @@ const config = (function (config) {
 		"marchineAdd": config.hostName+"/sys/machine/add", // 新增区域
 		"marchineEdit": config.hostName+"/sys/machine/edit", // 修改区域
 		"marchineDelete": config.hostName+"/sys/machine/delete", // 删除区域
+		"marchineLog": config.hostName+"/sys/machine/log", // 设备模组调用日志
+		"marchineModelSumUsed": config.hostName+"/sys/machine/modelSumUsed", // 设备模组使用报表
+		"marchineSumUsed": config.hostName+"/sys/machine/sumUsed", // 设备使用报表
 
 		// 参数配置
 		"configList": config.hostName+"/sys/config/list", // 参数列表
@@ -66,6 +69,15 @@ const config = (function (config) {
 
 		// 文件上传
 		"setFileUpload": config.hostName+"/upload/file", //文件上传
+
+		// 应急预案管理
+		"emergencyList": config.hostName+"/sys/emergency/list", // 版本列表
+		"emergencyAdd": config.hostName+"/sys/emergency/add", // 新增版本
+		"emergencyEdit": config.hostName+"/sys/emergency/edit", // 修改版本
+		"emergencyDelete": config.hostName+"/sys/emergency/delete", // 删除版本
+		"emergencyGet": config.hostName+"/sys/emergency/get", // 版本详情
+		"emergencyEnable": config.hostName+"/sys/emergency/enable", // 启用版本
+		"emergencyDisable": config.hostName+"/sys/emergency/disable", // 禁用版本
 
 	};
 

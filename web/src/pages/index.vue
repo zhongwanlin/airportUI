@@ -1,6 +1,28 @@
 <template>
     <div id="index">
         
+
+
+        <!-- 紧急预案处理 -->
+        <template v-if="isOnline">
+            <div class="onlineWrap">
+                <template v-if="errorImgList.length>0">
+                    <Carousel loop autoplay :height="height">
+                        <template v-for="(item, index) in errorImgList">
+                            <CarouselItem :key="index">
+                                <div :style="{height: height+'px'}">
+                                    <img :src="item"/>
+                                </div>
+                            </CarouselItem>
+                        </template>
+                    </Carousel>
+                </template>
+                <template v-else>
+                    <img :src="errorImg"/>
+                </template>
+            </div>
+        </template>
+
     </div>
 </template>
 
@@ -9,6 +31,7 @@ import {
     mapState,
     mapMutations
 } from "vuex";
+import error from "../common/error";
 export default {
     name: "index",
     components: {
@@ -22,7 +45,10 @@ export default {
         currentMenu: 1,
         navTitle: "",
         locale: "",
-        
+        isOnline: false,
+        errorImg: error.errorImg,
+        errorImgList: [],
+        emergencyList: [],
         searchData: [],
         timeNum: 0,
         timeInterval: null,
@@ -32,79 +58,42 @@ export default {
     },
     methods: {
         ...mapMutations([]),
-        toggleMainMenu(){
-            let self = this;
-            self.setFaceVideo(false);
-            self.isShowMenu = !self.isShowMenu;
-        },
-        refleshAction() {
-            let self = this;
-            self.hiddenCamera();
-            setTimeout(()=>{
-                self.userCamera(self);
-            }, 500);
-        },
-        // 格式化
-        formatSearchData(){
-            let self = this;
-            
-            self.searchData = [];
-
-            for(let key in window.mock.demoInfo){
-                if(window.mock.demoInfo.hasOwnProperty(key)) {
-                    (function(key){
-                        self.searchData.push(window.mock.demoInfo[key]);
-                    }(key));
-                }
-            }
-        },
-        // 视频切换
-        toggleFaceVideo() {
-            let self = this;
-            self.setFaceVideo(true);
-            self.setCRouter("voice");
-        },
-
-        // 路由跳转
-        setCRouter(router) {
-            let self = this;
-            self.setFaceVideo(false);
-            self.isShowMenu = false;
-            self.setFaceVideo(false);
-            self.$router.push({
-                name: router
-            });
-        },
-
-        // 设置tab
-        routerToPart(router) {
-            let self = this;
-            self.setCRouter(router);
-            self.toggleMainMenu(false);
-        },
-
+        
         // 调用各个模块，例如摄像头等记录
-        getLogWrite() {
-            let self = this;
-
-            self
-                .axios({
-                    method: "post",
-                    url: self.$config.action.getLogWrite,
-                    headers: {
-                        gomstoken: self.$utility.getLocalStorage("gomstoken")
-                    },
-                    data: {
-                        mac_model_id: "",
-                        sdk_name: "",
-                        versions: "",
-                        run_status: ""
+        getEmergencyList(bool){
+            var self = this;
+            self.axios({
+                method: 'get',
+                headers: {
+                    gomstoken: "866822030391163"
+                },
+                url: self.$config.action.emergencyList,
+                params: {
+                    "pageNum": 1,
+                    "pageSize": 1000,
+                    "name": "",
+                    "dep_status": "",
+                }
+            })
+            .then(function (res) {
+                self.errorImgList = [];
+                for(var i = 0, len = res.data.list.length; i < len; i++) {
+                    if(res.data.list[i]["status"] == 1) {
+                        self.emergencyList = JSON.parse(res.data.list[i]["url"]);
+                        break;
                     }
-                })
-                .then(function (data) {})
-                .catch(function () {
-                    console.log(catche);
+                }
+                self.emergencyList.forEach(item => {
+                    self.$utility.convertImgToBase64(item,(dataURL)=>{
+                        self.errorImgList.push(dataURL);
+                    });
                 });
+
+                console.log(self.errorImgList);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
         },
 
         // 获取设备信息
@@ -141,7 +130,6 @@ export default {
                     } else {
                         self.setFaceInfo(false);
                         self.setIsFace(true);
-                        self.setCRouter('flight');
                     }
                 }).toString());
         },
@@ -267,7 +255,6 @@ export default {
                             self.setFaceInfo(false);
                             self.setIsFace(true);
                             self.setIsSwitchScan(false);
-                            self.setCRouter('flight');
                         }
                     }
                 }
@@ -280,7 +267,6 @@ export default {
         init(){
             let self = this;
             return function() {
-                self.setCRouter('flight');
                 self.setFaceInfoDetail(null);
                 self.setFaceInfo(false);
                 self.setIsScaning(false);
@@ -290,7 +276,22 @@ export default {
                     window.appInfo["_0"]["stopVoice"]();
                 }
             };
-        }
+        },
+
+        // 判断网络状态
+        onLine(){
+            let self = this;
+            var img = new Image();
+            // img.src = self.$config.hostName + "/assets/error.png?t" + Date.now();
+            img.src = "http://air.cityeasyplay.com:8080/terminal/static/中国1.png?t" + Date.now();
+            console.log(img.src);
+            img.onload=function(){
+                self.isOnline = false;       
+            };
+            img.onerror=function(){
+                self.isOnline = true;     
+            };
+        }	
 
     },
     created() {
@@ -323,6 +324,12 @@ export default {
             // 扫身份证
             self.scanIDCard();
         }
+
+        // 预案处理
+        self.getEmergencyList();
+        setInterval(()=>{
+            self.onLine();
+        }, 5000);
     }
 };
 </script>
@@ -330,4 +337,18 @@ export default {
 <style lang="less">
 @import "~@/common/animate.min.css";
 @import "~@/common/unit.less";
+.onlineWrap {
+    position: fixed;
+    z-index: 10000000000;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    img {
+        width: 100%;
+        height: 100%;
+    }
+}
 </style>

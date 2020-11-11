@@ -5,24 +5,16 @@
                 <table>
                     <tr>
                         <td>
-                            是否满意
+                            设备
                             <template>
-                                <Select v-model="searchInfo.satisfiedFlag" clearable placeholder="选择是否满意" style="width: 120px;">
-                                    <Option :value="1">满意</Option>
-                                    <Option :value="2">不满意</Option>
+                                <Select v-model="searchInfo.mac_id" clearable style="width:200px">
+                                    <Option v-for="item in marchineList" :value="item.id" :key="item.id">{{ item.name }}</Option>
                                 </Select>
                             </template>
-                            &nbsp;&nbsp;开始时间
-                            <template>
-                                <DatePicker type="date" clearable :options="dataPickOption" @on-change="setBeginTime" placeholder="请选择时间" style="width: 120px"></DatePicker>
-                            </template>
-							&nbsp;&nbsp;结束时间
-							<template>
-							    <DatePicker type="date" clearable :options="dataPickOption" @on-change="setEndTime" placeholder="请选择时间" style="width: 120px"></DatePicker>
-							</template>
                             <template>
                                 <div class="searchBtnList">
-                                    <Button icon="ios-refresh-circle" @click="reflesh(true)">刷新</Button>
+                                    <Button type="primary" icon="ios-add-circle" @click="showNew">新增</Button>
+                                    <Button icon="ios-refresh-circle" @click="reflesh">重置</Button>
                                 </div>
                             </template>
                         </td>
@@ -33,22 +25,24 @@
 
         <div class="tableList">
             <template>
-                <Table :height="height-100" stripe border :loading="isLoading" :columns="columns" :data="dataList">
-                    
-                    <template slot-scope="{ row, index }" slot="serviceLevel">
-                        <template v-if="row.serviceLevel!==''"><Rate disabled :value="row.serviceLevel" /></template>
+                <Table :height="height-100" border stripe :loading="isLoading" :columns="columnsRealTime" :data="realTimeDataList">
+                    <template slot-scope="{ row, index }" slot="action">
+                        <Button type="primary" size="small" @click="showEdit(row)">修改</Button>&nbsp;&nbsp;
+                        <Button type="error" size="small" @click="deleteAction(row)">删除</Button>
                     </template>
-                    <template slot-scope="{ row, index }" slot="searchSpeed">
-                        <template v-if="row.searchSpeed!==''"><Rate disabled :value="row.searchSpeed" /></template>
+                    <template slot-scope="{ row, index }" slot="macInfo">
+                        <template v-for="item in JSON.parse(row.macInfo)">
+                            {{item.name}}
+                        </template>
                     </template>
-                    <template slot-scope="{ row, index }" slot="systemConvenience">
-                        <template v-if="row.systemConvenience!==''"><Rate disabled :value="row.systemConvenience" /></template>
+                    <template slot-scope="{ row, index }" slot="status">
+                        <template>
+                            <i-switch size="large" :value="row.status" :true-value="1" :false-value="0" @on-change="enableOrNot(row.status==0?'1':'0', row)">
+                                <span slot="open">启用</span>
+                                <span slot="close">禁用</span>
+                            </i-switch>
+                        </template>
                     </template>
-					
-					<template slot-scope="{ row, index }" slot="action">
-						<Button type="text" class="info" size="small" @click="showNewOrEdit(row)">修改</Button>
-					</template>
-
                 </Table>
             </template>
         </div>
@@ -57,178 +51,190 @@
                 <Page :total="count" @on-change="pageSizeChange" @on-page-size-change="pageRowChange" :page-size="50" :page-size-opts="[50, 100, 150]" show-sizer showTotal />
             </template>
         </div>
-		
-		<template>
-		    <Modal v-model="isDetail" class="noContentPadding" :mask-closable="false" width="40" :styles="{top: '10%'}" title="旅客评论详情" @on-cancel="isDetail=false">
-		        <div class="modalTable">
-		            <div class="detail">
-		                <table>
-		                    <tr>
-		                        <td class="label" style="width: 150px;">旅客姓名</td>
-		                        <td style="width: 50%;">{{itemInfo.lostUserName}}</td>
-		                    </tr>
-		                    <tr>
-		                        <td class="label">旅客电话</td>
-		                        <td>{{itemInfo.userPhone}}</td>
-		                    </tr>
-		                    <!-- <tr>
-		                        <td class="label">是否满意</td>
-		                        <td>{{['满意', '不满意'][itemInfo.satisfiedFlag-1]}}</td>
-		                    </tr> -->
-							<tr>
-							    <td class="label">平分</td>
-							    <td><Rate disabled :value="itemInfo.serviceLevel" /></td>
-							</tr>
-							<tr>
-							    <td class="label">旅客建议</td>
-							    <td>{{itemInfo.clientSuggestion}}</td>
-							</tr>
-							<tr>
-							    <td class="label vt">工作人员回复</td>
-							    <td>
-									<Input v-model="itemInfo.replyInfo" type="textarea" :rows="4" placeholder="请输入工作人员回复" style="width: 100%" />
-								</td>
-							</tr>
-		                </table>
-		            </div>
-		        </div>
-		        <div slot="footer" class="modalFooter">
-		            <template>
-		                <Button type="default" @click="isDetail=false" style="margin-right: 5px">关闭</Button>
-		                <Button type="primary" @click="saveLostCustomerEvaluation" :disabled="disable">提交</Button>
-		            </template>
-		        </div>
-		    </Modal>
-		</template>
+
+        <template>
+            <Modal v-model="isDetail" class="noContentPadding noHeaderModal" :mask-closable="false" width="30" :styles="{top: '5%'}" title="角色录入" @on-cancel="isDetail=false">
+                <div class="modalTable">
+                    <div class="detail">
+                        <table>
+                            <tr>
+                                <td>
+                                    <span class="request">*</span>预案名称：
+                                    <div><Input v-model="itemInfo.name" placeholder="填写预案名称" style="width: 100%" /></div>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    设备：
+                                    <div>
+                                        <Select v-model="itemInfo.macInfos" multiple style="width:100%">
+                                            <Option v-for="item in marchineList" :value="item.mac_id+'-'+item.name" :key="item.id">{{ item.name }}</Option>
+                                        </Select>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="request">*</span>图片：
+                                    <div>
+                                        <template>
+                                            <Upload
+                                            multiple
+                                            :headers="{token: userInfo.token}" 
+                                            :action="$config.action.setFileUpload"
+                                            :disabled="disable"
+                                             :show-upload-list="isShowUploadList" 
+                                             :on-error="errorUpload" 
+                                             :on-progress="progressing" 
+                                             :on-success="uploadSuccess"
+                                             :on-remove="removeFile">
+                                                <Button icon="ios-cloud-upload-outline">上传图片</Button>
+                                            </Upload>
+                                        </template>
+                                    </div>
+                                    <div style="padding: 10px 0;">
+                                        <Row :gutter="10">
+                                            <template v-for="(img,index) in itemInfo.urls">
+                                                <Col span="12" :key="index">
+                                                    <div :key="index">
+                                                        <img :src="img" style="width: 100%" />
+                                                    </div>
+                                                </Col>
+                                            </template>
+                                        </Row>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div slot="footer" class="modalFooter">
+                    <template>
+                        <Button type="default" @click="isDetail=false" style="margin-right: 5px">关闭</Button>
+                        <Button type="primary" @click="saveAction" :disable="disable">提交</Button>
+                    </template>
+                </div>
+            </Modal>
+        </template>
 
     </div>
 </template>
 
 <script>
 export default {
-    name: "lostAndFound",
+    name: "role",
+    components: { },
     data: () => ({
         userInfo: null,
         height: window.innerHeight,
-        isLoading: false,
+        isModalLoading: false,
         isDetail: false,
+        isFunction: false,
+        isInfo: false,
         disable: false,
-        dateInfo: [],
+        isLoading: false,
+        isShowUploadList: false,
         count: 0,
         pageInfo: {
-            pageIndex: 1,
+            pageIndex: 0,
             pageSize: 50,
         },
         searchInfo: {
-            satisfiedFlag: "", // 是否满意
-            beginTime: "", // 查询开始时间,yyyy-MM-dd
-            endTime: "", // 查询结束时间，yyyy-MM-dd
+            "macName": "",
+            "mac_id": "",
         },
-		itemInfo: {
-			id: 0, // 唯一ID，修改信息时必传
-			paraId: 0, // 要回复的评价id
-			lostRegId: 0, // 报失记录id
-			lostUserName: "",  // 旅客名称
-			userPhone: "", //旅客电话 
-			lostUserId: "", 
-			serviceLevel: "", 
-			satisfiedFlag: "", 
-			clientSuggestion: "", 
-			replyInfo: "", 
-			modifyUserId: "", 
-		},
-        columns: [
+        itemInfo: {
+            "id": 0,
+            "macInfos": [],
+            "name": "",
+            "urls": []
+        },
+        columnsRealTime: [
             {
-                title: "选择",
                 align: "center",
+                title: "序号",
                 type: "index",
                 width: 60,
             },
             {
-                title: "机器ID",
+                title: "预案名称",
                 align: "center",
-                key: "lostUserName",
+                key: "name",
             },
             {
-                title: "机器名称",
+                title: "设备",
                 align: "center",
-                key: "userPhone",
+                key: "macInfo",
+                slot: "macInfo",
             },
             {
-                title: "环境评价",
+                title: "创建时间",
                 align: "center",
-                slot: "serviceLevel",
+                key: "create_time",
             },
             {
-                title: "服务评价",
+                title: "更新时间",
                 align: "center",
-                slot: "searchSpeed",
+                key: "update_time",
             },
             {
-                title: "评论内容",
                 align: "center",
-                key: "clientSuggestion",
+                title: "状态",
+                width: 120,
+                slot: 'status'
             },
             {
-                title: "评论时间",
                 align: "center",
-                key: "modifyTime",
-            },
-        ],
-        areaCodeList: [],
-        dataList: [],
-        dataPickOption: {
-            disabledDate (date) {
-                return date && date.valueOf() > Date.now();
+                title: "操作",
+                width: 220,
+                slot: 'action'
             }
-        },
+        ],
+        realTimeDataList: [],
+        marchineList: []
     }),
     methods: {
-		setBeginTime(value) {
-			let self = this;
-			self.searchInfo.beginTime = value;
-		},
-		setEndTime(value) {
-			let self = this;
-			self.searchInfo.endTime = value;
-		},
-        reflesh(bool){
-            let self = this;
-            self.getLostCustomerEvaluationList(bool);
-        },
         pageSizeChange(value) {
-            let self = this;
+            var self = this;
             self.pageInfo.pageIndex = parseInt(value, 10);
-            self.getLostCustomerEvaluationList(true);
+            self.getList(true);
         },
         pageRowChange(value) {
-            let self = this;
+            var self = this;
             self.pageInfo.pageSize = parseInt(value, 10);
-            self.getLostCustomerEvaluationList(false);
+            self.getList(false);
         },
-        // 获取失物
-        getLostCustomerEvaluationList(bool){
-            let self = this;
-            
-            self.isLoading = true;
+        reflesh(){
+            var self = this;
+            self.getList(true);
+        },
+
+        // 获取公司列表
+        getList(bool){
+            var self = this;
             if (bool == true) {
-                self.pageInfo.pageIndex = 1;
+                self.isLoading = true;
+                self.pageInfo.pageIndex = 0;
             }
             self.axios({
-                method: 'post',
-                headers: self.$utility.setHeader(self.$config.service.evaluationService),
-                url: self.$config.action.getLostCustomerEvaluationList,
-                data: self.$qs.stringify({
-					"pageNum": self.pageInfo.pageIndex,
-					"pageSize": self.pageInfo.pageSize,
-					"satisfiedFlag": self.searchInfo.satisfiedFlag,
-					"beginTime": self.searchInfo.beginTime,
-					"endTime": self.searchInfo.endTime,
-				})
+                method: 'get',
+                headers: {
+                    token: self.userInfo.token
+                },
+                url: self.$config.action.emergencyList,
+                params: {
+                    "pageNum": self.pageInfo.pageIndex,
+                    "pageSize": self.pageInfo.pageSize,
+                    "name": self.searchInfo.macName,
+                    "dep_status": self.searchInfo.mac_id,
+                }
             })
             .then(function (res) {
-                if(res.data.code=='200') {
-                    self.dataList = res.data.data;
+                self.realTimeDataList = res.data.list;
+                self.count = res.data.total;
+                if(res.data.code=='0') {
+                    self.realTimeDataList = res.data.data;
                     self.count = res.data.count;
                 } else if(res.data.code=='9003') {
                     self.utility.loginTimeOut(self);
@@ -242,63 +248,242 @@ export default {
                 self.isLoading = false;
             });
         },
-		showNewOrEdit(row){
-			let self = this;
-			self.itemInfo = row;
-			self.isDetail = true;
-		},
-		saveLostCustomerEvaluation(){
-			let self = this;
-			if(self.itemInfo.replyInfo.trim().length == 0) {
-				self.$Message.error("请输入回复的内容");
-				return;
-			}
-			self.axios({
-			    method: 'post',
-			    headers: self.$utility.setHeader(self.$config.service.evaluationService),
-			    url: self.$config.action.saveLostCustomerEvaluation,
-			    data: self.$qs.stringify({
-					id: self.itemInfo.id||0, // 唯一ID，修改信息时必传
-					paraId: self.itemInfo.paraId||0, // 要回复的评价id
-					lostRegId: self.itemInfo.lostRegId, // 报失记录id
-					lostUserName: self.itemInfo.lostUserName, // 旅客名称
-					userPhone: self.itemInfo.userPhone, //旅客电话 
-					lostUserId: self.itemInfo.lostUserId, 
-					serviceLevel: self.itemInfo.serviceLevel, 
-					satisfiedFlag: self.itemInfo.satisfiedFlag, 
-					clientSuggestion: self.itemInfo.clientSuggestion, 
-					replyInfo: self.itemInfo.replyInfo, 
-					modifyUserId: self.userInfo.id, 
-				})
-			})
-			.then(function (res) {
-			    if(res.data.code=='200') {
-					self.getLostCustomerEvaluationList(true);
-			        self.isDetail = false;
-			    } else if(res.data.code=='9003') {
-			        self.utility.loginTimeOut(self);
-			    } else {
-			        self.$Message.error(res.data.msg);
-			    }
-			    self.isLoading = false;
-			})
-			.catch(function (error) {
-			    console.log(error);
-			    self.isLoading = false;
-			});
-		}
+        // 显示新增
+        showNew(){
+            let self = this;
+            self.itemInfo = {
+                "id": 0,
+                "macInfos": [],
+                "name": "",
+                "urls": []
+            };
+            self.isDetail = true;
+        },
+        // 显示编辑
+        showEdit(item){
+            let self = this;
+            for(var key in item) {
+                self.itemInfo[key] = item[key];
+            }
+            self.itemInfo.urls = JSON.parse(item.url);
+            let macInfoList = JSON.parse(item.macInfo);
+            self.itemInfo.macInfos = [];
+            macInfoList.forEach((item)=>{
+                self.itemInfo.macInfos.push(item.mac_id+'-'+item.name);
+            });
+            console.log(self.itemInfo.macInfos);
+            self.isDetail = true;
+        },
+
+        // 保存
+        saveAction(){
+            let self = this;
+            let macInfos = [];
+
+            console.log(self.itemInfo.name);
+
+            if(self.itemInfo.name.length == 0) {
+                self.$Message.error("请输入预案名称");
+                return;
+            }
+
+            if(self.itemInfo.macInfos.length == 0) {
+                self.$Message.error("请选择设备");
+                return;
+            }
+            if(self.itemInfo.urls.length==0) {
+                self.$Message.error("请上传图片");
+                return;
+            }
+
+            self.itemInfo.macInfos.forEach((item)=>{
+                let info = item.split("-");
+                macInfos.push({
+                    mac_id: info[0],
+                    name: info[1],
+                });
+            });
+            
+            self.disable = true;
+            self.axios({
+                method: 'post',
+                headers: {
+                    token: self.userInfo.token
+                },
+                url: !self.itemInfo.id?self.$config.action.emergencyAdd:self.$config.action.emergencyEdit,
+                data: {
+                    "id": self.itemInfo.id || 0, 
+                    "macInfos": macInfos,
+                    "name": self.itemInfo.name,
+                    "urls": self.itemInfo.urls
+                }
+            })
+            .then(function (res) {
+                if(res.data.code=='0') {
+                    self.$Message.success("提交成功");
+                    self.getList(false);
+                    self.isDetail = false;
+                    self.isShowUploadList = false;
+                    self.itemInfo = {
+                        "id": 0,
+                        "macInfos": [],
+                        "name": "",
+                        "urls": []
+                    };
+                } else if(res.data.code=='9003') {
+                    self.utility.loginTimeOut(self);
+                } else {
+                    self.$Message.error(res.data.msg);
+                }
+                self.disable = false;
+            })
+            .catch(function (error) {
+                console.log(error);
+                self.disable = false;
+                self.isShowUploadList = false;
+            });
+        },
+        // 删除公司
+        deleteAction(item){
+            let self = this;
+            self.$Modal.confirm({
+                "title": "确定删除"+ item.name+"?",
+                onOk() {
+                    self.axios({
+                        method: 'post',
+                        headers: {
+                            token: self.userInfo.token
+                        },
+                        url: self.$config.action.emergencyDelete,
+                        data: {
+                            "id": item.id
+                        }
+                    })
+                    .then(function (res) {
+                        if(res.data.code=='0') {
+                            self.$Message.success("删除成功");
+                            self.getList(true);
+                        } else if(res.data.code=='9003') {
+                            self.utility.loginTimeOut(self);
+                        } else {
+                            self.$Message.error(res.data.msg);
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+                }
+            });
+        },
+        // 获取设备列表
+        getDeviceList(bool){
+            var self = this;
+            
+            self.axios({
+                method: 'get',
+                headers: {
+                    token: self.userInfo.token
+                },
+                url: self.$config.action.marchineList,
+                params: {
+                    "pageNum": 1,
+                    "pageSize": 10000,
+                    "area_id": "",
+                    "dep_status": "",
+                    "mac_id": "",
+                    "status": "",
+                    "version": "",
+                    "name": "",
+                }
+            })
+            .then(function (res) {
+                self.marchineList = res.data.list;
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        },
+        // 启用或禁用
+        enableOrNot(value, row){
+            let self = this;
+            self.axios({
+                method: 'post',
+                headers: {
+                    token: self.userInfo.token
+                },
+                url: value==1?self.$config.action.emergencyEnable:self.$config.action.emergencyDisable,
+                data: {
+                    "id": row.id
+                }
+            })
+            .then(function (res) {
+                if (res.data.code == '0') {
+                    self.$Message.success("修改成功");
+                    self.getList(false);
+                } else if (res.data.code == "419") {
+                    self.$utility.loginTimeOut(self);
+                } else {
+                    self.$Message.error(res.data.msg);
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        },
+        // 文件上传中
+        progressing(){
+            let self = this;
+            self.disabled = true;
+        },
+        // 上传失败
+        errorUpload(){
+            let self = this;
+            self.disabled = false;
+            console.log(error);
+        },
+        // 
+        removeFile(file, fileList){
+            let self = this;
+            self.itemInfo.urls = [];
+            fileList.forEach((item) => {
+                if(!!item.response.data) {
+                    self.itemInfo.urls.push(self.$config.hostName+item.response.data);
+                }
+            });
+        },
+        // 
+        uploadSuccess(response, file, fileList){
+            let self = this;
+            self.disabled = false;
+            console.log(response);
+            if(!!response.data&&response.data.length>0) {
+                self.isShowUploadList = true;
+                self.itemInfo.urls = [];
+                fileList.forEach((item) => {
+                    if(!!item.response.data) {
+                        self.itemInfo.urls.push(self.$config.hostName+item.response.data);
+                    }
+                });
+            } else {
+                self.$Message.error({
+                    content: response.data.result,
+                    duration: 5,
+                });
+            }
+        },
     },
     created() {
         let self = this;
         let userTimeOut = null;
         self.userInfo = self.$utility.getLocalStorage("userInfo");
-
-        self.getLostCustomerEvaluationList(true);
+        
+        self.getList(true); // 获取预案
+        self.getDeviceList(true); // 获取设备
 
         self.$watch('searchInfo', function () {
             clearTimeout(userTimeOut);
             userTimeOut = setTimeout(() => {
-                self.getLostCustomerEvaluationList(true);
+                self.getList(true);
             }, 200);
         }, {
             deep: true
