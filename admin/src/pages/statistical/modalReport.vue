@@ -18,6 +18,10 @@
                                     <Option v-for="item in marchineList" :value="item.id" :key="item.id">{{ item.mac_id }}({{ item.name }})</Option>
                                 </Select>
                             </template>
+                            &nbsp;&nbsp;时间
+                            <template>
+                                <DatePicker type="daterange" @on-change="dateChange" placeholder="选择时间" style="width: 300px"></DatePicker>
+                            </template>
                         </td>
                     </tr>
                 </table>
@@ -193,6 +197,15 @@ export default {
                 console.log(error);
             });
         },
+        // 设置时间
+        dateChange(e) {
+            let self = this;
+            console.log(e);
+            if(!!e&&e.length > 0) {
+                self.searchInfo.begDate = e[0];
+                self.searchInfo.endDate = e[1];
+            }
+        }
     },
     created() {
         let self = this;
