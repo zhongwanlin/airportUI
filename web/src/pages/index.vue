@@ -1,15 +1,104 @@
 <template>
     <view class="content">
+
+        <view class="header">
+			<view class="box">
+				<view class="nav">
+					<image style="width: 60px;height: 60px;" src="../static/icon06.png"></image>
+				</view>
+				<view class="icon">
+					<image style="width: 80px;height: 80px;" src="../static/icon05.png"></image>
+				</view>
+				<view class="label">
+					<text>说“刷脸”享受专属服务</text>
+				</view>
+			</view>
+		</view>
+
+        <view class="mainWrap">
+			<view class="title">
+				<view class="label">嗨，我是小美，</view>
+				<view class="label">您的语音小助手。</view>
+			</view>
+			<view class="info">我懂得可多了，号称百事通，快来问我吧！</view>
+			
+			<view class="bgWrap">
+				<image style="width: 750px;height: 760px;" src="../static/bg.png"></image>
+				<view class="voiceGif"><image class="imgGif" style="width: 300px;height: 200px;" src="../static/yuyin.gif"></image></view>
+			</view>
+			<div class="tagcloudWrap">
+				<div class="tagcloud">
+					<span>“有什么好吃的”</span>
+					<span>“停车场收费”</span>
+					<span>“医疗室在哪”</span>
+					<span>“南航 7645”</span>
+					<span>“买礼物”</span>
+					<span>“预约大巴”</span>
+					<span>“哪些东西不能带上飞机”</span>
+					<span>“我的航班”</span>
+				</div>
+			</div>
+		</view>
+
+        <view class="footer">
+            <view class="listWrap">
+                <view class="list">
+                    <view class="item">
+						<view class="wrap">
+							<view class="icon">
+								<image style="width: 80px;height: 80px;" src="../static/icon01.png"></image>
+							</view>
+							<view class="label">
+								<text>航班查询</text>
+							</view>
+						</view>
+                    </view>
+                    <view class="item">
+						<view class="wrap">
+							<view class="icon">
+								<image style="width: 80px;height: 80px;" src="../static/icon02.png"></image>
+							</view>
+							<view class="label">
+								<text>旅客指南</text>
+							</view>
+						</view>
+                    </view>
+                </view>
+                <view class="list">
+                    <view class="item">
+						<view class="wrap">
+							<view class="icon">
+								<image style="width: 80px;height: 80px;" src="../static/icon03.png"></image>
+							</view>
+							<view class="label">
+								<text>交通信息</text>
+							</view>
+						</view>
+                    </view>
+                    <view class="item">
+						<view class="wrap">
+							<view class="icon">
+								<image style="width: 80px;height: 80px;" src="../static/icon04.png"></image>
+							</view>
+							<view class="label">
+								<text>机场商业</text>
+							</view>
+						</view>
+                    </view>
+                </view>
+            </view>
+        </view>
+
         <!-- 紧急预案处理 -->
         <template v-if="isOnline">
-            <div class="onlineWrap">
+            <view class="onlineWrap">
                 <template v-if="errorImgList.length>0">
                     <swiper :indicator-dots="true" :autoplay="true" :interval="2000" :duration="500" :style="{height: systemInfo.screenHeight+'px'}">
                         <template v-for="(item, index) in errorImgList">
                             <swiper-item :key="index" :style="{height: systemInfo.screenHeight+'px'}">
-                                <div :style="{height: systemInfo.screenHeight+'px'}">
+                                <view :style="{height: systemInfo.screenHeight+'px'}">
                                     <img :src="item" :style="{height: systemInfo.screenHeight+'px'}"/>
-                                </div>
+                                </view>
                             </swiper-item>
                         </template>
                     </swiper>
@@ -17,13 +106,14 @@
                 <template v-else>
                     <img :src="errorImg"/>
                 </template>
-            </div>
+            </view>
         </template>
     </view>
 </template>
 
 <script>
 import error from "../common/error";
+import tagcloud from '../common/tagcloud.js';
 export default {
     components: {
 
@@ -459,24 +549,24 @@ export default {
         setInterval(()=>{
             self.onLine();
         }, 5000);
-    }
+    },
+	mounted() {
+		let self = this;
+		setTimeout(()=>{
+			let tagcloudFun = tagcloud({
+				selector: ".tagcloud",//元素选择器
+				fontsize: 32,//基本字体大小, 单位px
+				radius: self.systemInfo.screenWidth/4,//滚动半径, 单位px
+				mspeed: "slow",//滚动最大速度, 取值: slow, normal(默认), fast
+				ispeed: "slow",//滚动初速度, 取值: slow, normal(默认), fast
+				direction: 0,
+				keep: true //鼠标移出组件后是否继续随鼠标滚动, 取值: false, true(默认) 对应 减速至初速度滚动, 随鼠标滚动
+			});
+		}, 1500);
+	},
 };
 </script>
 
 <style lang="less" scoped>
 @import "~@/common/common.less";
-.onlineWrap {
-    position: fixed;
-    z-index: 10000000000;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    width: 100%;
-    height: 100%;
-    img {
-        width: 100%;
-        height: 100%;
-    }
-}
 </style>
