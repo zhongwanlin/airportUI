@@ -225,7 +225,9 @@ export default {
         },
         reflesh(){
             var self = this;
-            self.getList(true);
+            self.getList(true); // 获取角色
+            self.getAreaList(true); // 获取角色
+            self.getVersionList(true); // 获取版本
         },
 
         // 获取公司列表

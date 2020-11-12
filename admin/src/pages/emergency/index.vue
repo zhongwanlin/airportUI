@@ -207,7 +207,8 @@ export default {
         },
         reflesh(){
             var self = this;
-            self.getList(true);
+            self.getList(true); // 获取预案
+            self.getDeviceList(true); // 获取设备
         },
 
         // 获取公司列表

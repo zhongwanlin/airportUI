@@ -90,9 +90,9 @@
                                     <span class="request">*</span>角色：
                                     <div>
                                         <template>
-                                            <Select v-model="itemInfo.role" clearable placeholder="选择角色" style="width: 100%;">
+                                            <Select v-model="itemInfo.rolename" clearable placeholder="选择角色" style="width: 100%;">
                                                 <template v-for="(item, index) in roleList">
-                                                    <Option :value="item.id" :key="index">{{item.name}}</Option>
+                                                    <Option :value="item.name" :key="index">{{item.name}}</Option>
                                                 </template>
                                             </Select>
                                         </template>
@@ -112,36 +112,6 @@
                                     <div><Input v-model="itemInfo.email" placeholder="常用邮箱" style="width: 100%" /></div>
                                 </td>
                             </tr>
-                            <!-- <tr>
-                                <td>
-                                    头像：
-                                    <div>
-                                        <template>
-                                            <Upload
-                                            :headers="{token: userInfo.token}" 
-                                            :action="$config.action.setFileUpload"
-                                            :disabled="disable"
-                                             :show-upload-list="false" 
-                                             :on-error="errorUpload" 
-                                             :on-progress="progressing" 
-                                             :on-success="uploadSuccess">
-                                                <Button icon="ios-cloud-upload-outline">上传头像</Button>
-                                            </Upload>
-                                        </template>
-                                    </div>
-                                </td>
-                            </tr> -->
-                            <!-- <tr>
-                                <td>
-                                    <span class="request">*</span>帐号状态：
-                                    <div>
-                                        <RadioGroup>
-                                            <Radio label="0">禁用</Radio>
-                                            <Radio label="1">启用</Radio>
-                                        </RadioGroup>
-                                    </div>
-                                </td>
-                            </tr> -->
                         </table>
                     </div>
                 </div>
@@ -185,7 +155,7 @@ export default {
             "id": "",
             "email": "",
             "mobile": "",
-            "role": "",
+            "roleid": "",
             "nickname": "",
             "password": "",
             "username": "",
@@ -261,6 +231,8 @@ export default {
         reflesh(){
             var self = this;
             self.getList(true);
+            self.getRoleList();
+            self.getDepetList();
         },
 
         // 获取用户列表
@@ -302,6 +274,7 @@ export default {
             self.itemInfo = {
                 "id": "",
                 "email": "",
+                "roleid": "",
                 "mobile": "",
                 "nickname": "",
                 "password": "",
@@ -323,7 +296,6 @@ export default {
 
             if(self.itemInfo.orgid>=0) {
                 self.$utility.setDepetList(self.treeData, self.itemInfo.orgid, arr);
-                console.log(arr);
                 arr[0].split(",").forEach((item)=>{
                     self.itemInfo.orgids.push(parseInt(item, 10));
                 });
@@ -354,6 +326,12 @@ export default {
                     return;
                 }
             }
+
+            self.roleList.forEach((item)=>{
+                if(self.itemInfo.rolename == item.name) {
+                    self.itemInfo.roleid = item.id;
+                }
+            });
             
             self.disable = true;
             self.axios({
@@ -366,7 +344,7 @@ export default {
                     "id": self.itemInfo.id||"", 
                     "email": self.itemInfo.email,
                     "mobile": self.itemInfo.mobile,
-                    "role": self.itemInfo.role,
+                    "roleid": self.itemInfo.roleid,
                     "nickname": self.itemInfo.nickname,
                     "password": !!self.newPassword?md5(self.newPassword):"",
                     "username": self.itemInfo.username,
@@ -381,6 +359,7 @@ export default {
                     self.itemInfo = {
                         "id": "",
                         "email": "",
+                        "roleid": "",
                         "mobile": "",
                         "nickname": "",
                         "password": "",

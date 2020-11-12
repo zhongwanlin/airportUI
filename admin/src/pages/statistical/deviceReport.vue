@@ -86,7 +86,8 @@ export default {
             }
         ],
         realTimeDataList: [],
-        areaList: []
+        areaList: [],
+        marchineList: []
     }),
     methods: {
         pageSizeChange(value) {

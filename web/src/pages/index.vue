@@ -1,99 +1,122 @@
 <template>
-    <div id="index">
-        
-
-
+    <view class="content">
         <!-- 紧急预案处理 -->
         <template v-if="isOnline">
             <div class="onlineWrap">
                 <template v-if="errorImgList.length>0">
-                    <Carousel loop autoplay :height="height">
+                    <swiper :indicator-dots="true" :autoplay="true" :interval="2000" :duration="500" :style="{height: systemInfo.screenHeight+'px'}">
                         <template v-for="(item, index) in errorImgList">
-                            <CarouselItem :key="index">
-                                <div :style="{height: height+'px'}">
-                                    <img :src="item"/>
+                            <swiper-item :key="index" :style="{height: systemInfo.screenHeight+'px'}">
+                                <div :style="{height: systemInfo.screenHeight+'px'}">
+                                    <img :src="item" :style="{height: systemInfo.screenHeight+'px'}"/>
                                 </div>
-                            </CarouselItem>
+                            </swiper-item>
                         </template>
-                    </Carousel>
+                    </swiper>
                 </template>
                 <template v-else>
                     <img :src="errorImg"/>
                 </template>
             </div>
         </template>
-
-    </div>
+    </view>
 </template>
 
 <script>
-import {
-    mapState,
-    mapMutations
-} from "vuex";
 import error from "../common/error";
 export default {
-    name: "index",
     components: {
+
     },
-    data: () => ({
-        height: window.innerHeight,
-        isDetail: false,
-        isDefault: true,
-        isFace: true,
-        isShowMenu: true,
-        currentMenu: 1,
-        navTitle: "",
-        locale: "",
-        isOnline: false,
-        errorImg: error.errorImg,
-        errorImgList: [],
-        emergencyList: [],
-        searchData: [],
-        timeNum: 0,
-        timeInterval: null,
-    }),
-    computed: {
-        ...mapState([])
+    data() {
+        return {
+			userInfo: null,
+			locale: "",
+			isOnline: false,
+			errorImg: error.errorImg,
+			errorImgList: [],
+			emergencyList: [],
+			flightNo: "",
+			flightList: [],
+			voiceTxtShow: "",
+            paramsInfo: {},
+            systemInfo: uni.getSystemInfoSync(),
+        };
     },
+    watch: {
+
+    },
+    onLoad() {
+        let self = this;
+		
+		
+    },
+    onShow() {
+        let self = this;
+    },
+    onReachBottom() {},
+	onShareAppMessage(){},
+	onShareTimeline(){},
     methods: {
-        ...mapMutations([]),
-        
-        // 调用各个模块，例如摄像头等记录
-        getEmergencyList(bool){
+        // 获取应急预案
+        getEmergencyList(){
             var self = this;
-            self.axios({
-                method: 'get',
-                headers: {
+            uni.request({
+			    headers: {
                     gomstoken: "866822030391163"
                 },
                 url: self.$config.action.emergencyList,
-                params: {
-                    "pageNum": 1,
+			    method: "GET",
+			    data: {
+					"pageNum": 1,
                     "pageSize": 1000,
                     "name": "",
                     "dep_status": "",
-                }
-            })
-            .then(function (res) {
-                self.errorImgList = [];
-                for(var i = 0, len = res.data.list.length; i < len; i++) {
-                    if(res.data.list[i]["status"] == 1) {
-                        self.emergencyList = JSON.parse(res.data.list[i]["url"]);
-                        break;
+			    },
+			    success(res, statusCode, header) {
+					self.errorImgList = [];
+                    for(var i = 0, len = res.data.list.length; i < len; i++) {
+                        if(res.data.list[i]["status"] == 1) {
+                            self.emergencyList = JSON.parse(res.data.list[i]["url"]);
+                            break;
+                        }
                     }
-                }
-                self.emergencyList.forEach(item => {
-                    self.$utility.convertImgToBase64(item,(dataURL)=>{
-                        self.errorImgList.push(dataURL);
+                    self.emergencyList.forEach(item => {
+                        self.$utility.convertImgToBase64(item,(dataURL)=>{
+                            self.errorImgList.push(dataURL);
+                        });
                     });
-                });
-
-                console.log(self.errorImgList);
-            })
-            .catch(function (error) {
-                console.log(error);
+			    },
+			    fail(error) {
+			        console.log(error);
+			        uni.hideLoading();
+			    }
             });
+            
+        },
+
+        // 获取航班
+        flightSearch(){
+            var self = this;
+
+            uni.request({
+			    headers: {
+                    gomstoken: "866822030391163"
+                },
+                url: self.$config.action.flightSearch,
+			    method: "GET",
+			    data: {
+					"flightNo": self.flightNo
+			    },
+			    success(res, statusCode, header) {
+					self.errorImgList = res.data;
+			    },
+			    fail(error) {
+			        console.log(error);
+			        uni.hideLoading();
+			    }
+            });
+
         },
 
         // 获取设备信息
@@ -123,13 +146,12 @@ export default {
                     right: 0.327,
                     bottom: 0.63
                 }), (function (res) {
-                    window.appInfo["_2"]["base64"] = res.replace('{"imgBase64Strs":["', '').replace('"]}', '').replace(/\s+/g, "");
-                    window.appInfo["_2"]["imgBase64Strs"] = "data:image/jpeg;base64," + window.appInfo["_2"]["base64"];
-                    if(window.appInfo["_2"]["base64"].length > 0) {
-                        window.appInfo["_0"]["searchByFace"]();
+                    window.appInfo["_1"]["base64"] = res.replace('{"imgBase64Strs":["', '').replace('"]}', '').replace(/\s+/g, "");
+                    window.appInfo["_1"]["imgBase64Strs"] = "data:image/jpeg;base64," + window.appInfo["_1"]["base64"];
+                    if(window.appInfo["_1"]["base64"].length > 0) {
+                        
                     } else {
-                        self.setFaceInfo(false);
-                        self.setIsFace(true);
+
                     }
                 }).toString());
         },
@@ -154,7 +176,7 @@ export default {
                 3,
                 JSON.stringify({}),
                 function (res) {
-                    window.appInfo["_0"]["setDetailInfo"](3, res);
+
                 }.toString()
             );
         },
@@ -166,61 +188,18 @@ export default {
                 JSON.stringify({}),
                 function (res) {
                     // alert("扫身份证："+res);
-                    var demoMatch = window.mock.demoMatch;
-                    var info = {
-                        code: demoMatch[Math.floor(Math.random()*demoMatch.length)] || "CZ3337",
-                        name: JSON.parse(res.replace(/\s+/g, "").slice(1, res.length-1))["name"]
-                    };
-                    window.appInfo["_0"]["setDetailInfo"](4, JSON.stringify(info));
+                    // var demoMatch = window.mock.demoMatch;
+                    // var info = {
+                    //     code: demoMatch[Math.floor(Math.random()*demoMatch.length)] || "CZ3337",
+                    //     name: JSON.parse(res.replace(/\s+/g, "").slice(1, res.length-1))["name"]
+                    // };
+                    
                 }.toString()
             );
         },
-
-        // 机票结果
-        getDetal(){
-            let self = this;
-            return function (scanInfo) {
-                let mockData = window.mock.demoInfo;
-                for (let key in mockData) {
-                    if (mockData.hasOwnProperty(key)) {
-                        if (JSON.stringify(scanInfo).indexOf(key) >= 0) {
-                            if(!!scanInfo["name"]) {
-                                mockData[key]["name"] = scanInfo["name"];
-                            }
-                            self.setFaceInfoDetail(null);
-                            self.setFaceInfo(true);
-                            self.setIsScaning(true);
-                            self.setIsSwitchScan(false);
-                            self.setFaceInfoDetail(mockData[key]);
-                            self.setSpreed(true);
-                            self.$router.push({
-                                name: "detail"
-                            });
-
-                            break;
-                        }
-                    }
-                }
-                // 机票
-                self.sweepTicket();
-
-                // 扫身份证
-                self.scanIDCard();
-            }
-        },
-
-        // 设置扫码结果
-        setDetailInfo() {
-            let self = this;
-            return function(type, scanString) {
-                let mockData = window.mock.demoInfo;
-                let scanInfo = JSON.parse(scanString.replace(/\s+/g, ""));
-                window.appInfo["_0"]["getDetal"](scanInfo);
-            };
-        },
         
         // 通过人脸获取航班信息
-        searchByFace() {
+        searchDetailByFace() {
             let self = this;
             return function() {
                 var xmlHttp = new XMLHttpRequest();
@@ -245,16 +224,14 @@ export default {
                             };
                             if(!!localeSession) {
                                 if(localeSession.name != faceInfo.name) {
-                                    window.appInfo["_0"]["getDetal"](info);
+
                                 }
                             } else {
-                                window.appInfo["_0"]["getDetal"](info);
+
                             }
                            self.$utility.setSessionStorage("faceInfo", faceInfo);
                         } else {
-                            self.setFaceInfo(false);
-                            self.setIsFace(true);
-                            self.setIsSwitchScan(false);
+
                         }
                     }
                 }
@@ -264,17 +241,161 @@ export default {
             };
         },
 
+        // 语音模组
+        userVoice() {
+            let self = this;
+            return function(){
+                if(!!window.jsBridge) {
+                    window.jsBridge.hxpApi(
+                        5,
+                        JSON.stringify({}),
+                        function (res) {
+                            var bool = true;
+                            var voiceStr = JSON.parse(res)["voiceStr"];
+                            let voiceTxtInfo = "";
+                            clearTimeout(window.appInfo["_2"]["intervalTime"]);
+                            clearTimeout(window.appInfo["_2"]["overVoice2"]);
+                            clearTimeout(window.appInfo["_2"]["overVoice3"]);
+                            window.appInfo["_2"]["setShowVoiceTxtInfo"]("");
+                            window.appInfo["_2"]["overVoice2"] = setTimeout(()=>{
+                                window.appInfo["_2"]["setVoiceTxtInfo"]("", false);
+                            }, 2000);
+                            window.appInfo["_2"]["overVoice3"] = setTimeout(()=>{
+                                voiceTxtInfo = window.appInfo["_2"]["setVoiceTxtInfo"](voiceStr, true);
+                                window.appInfo["_2"]["setVoiceTxt"]("");
+                                window.appInfo["_2"]["setShowVoiceTxtInfo"](voiceStr);
+                            }, 0);
+
+                            if(voiceStr.length != 0) {
+                                
+                            }
+                        }.toString()
+                    );
+                }
+            };
+        },
+
+        // 暂停语音
+        stopVoice() {
+            let self = this;
+            return function(){
+                if(!!window.jsBridge) {
+                    window.jsBridge.hxpApi(
+                        10,
+                        JSON.stringify({}),
+                        function (res) {
+                            alert(res);
+                        }.toString()
+                    );
+                }
+            };
+        },
+
+        // 文字转语音
+        txtToVoice() {
+            let self = this;
+    
+            return function(txt) {
+                if(!!window.jsBridge && self.isShowDetail==false) {
+                    window.jsBridge.hxpApi(
+                        11,
+                        JSON.stringify(
+                            {"ctx": txt, speed: 7}
+                        ),
+                        function (res) {}.toString()
+                    );
+
+                    setTimeout(()=>{
+                        window.appInfo["_2"]["stopVoice"]();
+                    }, 1000);
+                    
+                    clearTimeout(window.appInfo["_2"]["userVoiceIntervl"]);
+                    window.appInfo["_2"]["userVoiceIntervl"] = setTimeout(()=>{
+                        window.appInfo["_2"]["userVoice"]();
+                        window.appInfo["_2"]["writeLog"]();
+                    }, txt.length/4*1000);
+
+                    clearTimeout(window.appInfo["_2"]["overVoice1"]);
+                    window.appInfo["_2"]["overVoice1"] = setTimeout(()=>{
+                        window.appInfo["_2"]["setVoiceTxtInfo"]("", false);
+                        window.appInfo["_2"]["setShowVoiceTxtInfo"]("");
+                        window.appInfo["_2"]["setVoiceTxt"]("欢迎使用语音助手,请说出您要找的服务");
+                    }, txt.length/4*1000+5000);
+                    
+                }
+            };
+        },
+
+        // 显示返回的结果
+        setVoiceTxt(){
+            let self = this;
+            return function(txt) {
+                self.htmlTxt = txt;
+            }
+        },
+
+        setVoiceTxtInfo(){
+            let self = this;
+            return function(txt, bool) {
+                if(bool == true) {
+                    self.voiceTxtInfo.push(txt); 
+                } else {
+                    self.voiceTxtInfo = [];
+                }
+                return self.voiceTxtInfo;
+            }
+        },
+
+        // 设置显示在页面上的数据
+        setShowVoiceTxtInfo(){
+            let self = this;
+            return function(txt) {
+                self.voiceTxtShow = txt;
+            }
+        },
+
+        // 把语音数据提交到服务器
+        uploadVoice(){
+            let self = this;
+            return function(voiceInfo) {
+                var xmlHttp = new XMLHttpRequest();
+                var formData = new FormData();
+                formData.append("content", voiceInfo);
+                window.appInfo["_2"]["setShowVoiceTxtInfo"]("");
+                xmlHttp.onreadystatechange = function () {
+                    if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                        var data = xmlHttp.responseText;
+                        var jsonData = JSON.parse(data);
+                        if (jsonData.code == 0) {
+                            if(window.appInfo["_2"]["tips"] != jsonData.data.reply_content) {
+                                window.appInfo["_2"]["tips"] = jsonData.data.reply_content;
+                                window.appInfo["_2"]["txtToVoice"](jsonData.data.reply_content);
+                                window.appInfo["_2"]["voiceInfo"] = jsonData.data.reply_content;
+                            }
+                            window.appInfo["_2"]["setVoiceTxt"](jsonData.data.reply_content);
+                            if(!!jsonData.data.action_data.jump_url) {
+                                window.appInfo["_2"]["getArticle"]({id: parseInt(jsonData.data.action_data.jump_url)});
+                            }
+                        } else {
+                            window.appInfo["_2"]["setVoiceTxtInfo"]("", false);
+                            if(window.appInfo["_2"]["errorNum"] == 0) {
+                                window.appInfo["_2"]["errorNum"]++;
+                                window.appInfo["_2"]["txtToVoice"]("抱歉,暂时没有找到您想要的服务");
+                            }
+                        }
+                    }
+                }
+                xmlHttp.open("POST", self.$config.action.asp, true);
+                xmlHttp.setRequestHeader("gomstoken", window.utility.getLocalStorage('gomstoken'));
+                xmlHttp.send(formData);
+            };
+        },
+
         init(){
             let self = this;
             return function() {
-                self.setFaceInfoDetail(null);
-                self.setFaceInfo(false);
-                self.setIsScaning(false);
-                self.userCamera(self);
+                self.userCamera(self); // 使用摄像头
                 self.$utility.setSessionStorage("faceInfo", null);
-                if(!!window.appInfo["_0"] && !!window.appInfo["_0"]["stopVoice"]) {
-                    window.appInfo["_0"]["stopVoice"]();
-                }
             };
         },
 
@@ -293,21 +414,26 @@ export default {
             };
         }	
 
-    },
-    created() {
+	},
+	created() {
         let self = this;
         window.airport = self.$config.airport;
         self.locale = self.$i18n.locale;
 
-        self.$Message.config({
-            top: 350,
-            duration: 10
-        });
-
-        window.appInfo["_0"]["searchByFace"] = self.searchByFace();
-        window.appInfo["_0"]["getDetal"] = self.getDetal();
-        window.appInfo["_0"]["setDetailInfo"] = self.setDetailInfo();
         window.appInfo["_0"]["init"] = self.init();
+
+        // 语音模块
+        window.appInfo["_2"]["userVoice"] = self.userVoice(); // 使用语音模块
+        window.appInfo["_2"]["stopVoice"] = self.stopVoice(); // 停止语音模块
+        window.appInfo["_2"]["setVoiceTxt"] = self.setVoiceTxt(); // 把语音转换成文字 
+        window.appInfo["_2"]["setVoiceTxtInfo"] = self.setVoiceTxtInfo(); // 拼接语音内容
+        window.appInfo["_2"]["txtToVoice"] = self.txtToVoice(); // 文字转语音
+        window.appInfo["_2"]["uploadVoice"] = self.uploadVoice(); // 提交语音内容到后台
+        window.appInfo["_2"]["intervalTime"] = null;
+        window.appInfo["_2"]["overVoice1"] = null;
+        window.appInfo["_2"]["overVoice2"] = null;
+        window.appInfo["_2"]["overVoice3"] = null;
+        window.appInfo["_2"]["userVoiceIntervl"] = null;
 
         // window.utility.setLocalStorage("gomstoken", "866822030391163");
 
@@ -316,14 +442,17 @@ export default {
             self.getTerminalInfo();
 
             // 人脸识别
-            self.userCamera(self);
+            // self.userCamera(self);
 
             // 扫机票
-            self.sweepTicket();
+            // self.sweepTicket();
             
             // 扫身份证
-            self.scanIDCard();
+            // self.scanIDCard();
         }
+
+        // 获取航班
+        self.flightSearch();
 
         // 预案处理
         self.getEmergencyList();
@@ -334,9 +463,8 @@ export default {
 };
 </script>
 
-<style lang="less">
-@import "~@/common/animate.min.css";
-@import "~@/common/unit.less";
+<style lang="less" scoped>
+@import "~@/common/common.less";
 .onlineWrap {
     position: fixed;
     z-index: 10000000000;

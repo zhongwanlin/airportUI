@@ -22,7 +22,26 @@ const config = (function (config) {
 		"asp": config.hostName + "/api/Asp", // 终端-语音识别
 		"writeLog": config.hostName + "/api/log/write", // 终端-调用模块记录
 
+		"flightSearch": config.hostName + "/api/flight/search", // 航班查询
+
 		"emergencyList": config.hostName+"/sys/emergency/list", // 版本列表
+	};
+
+	config.status = {
+		"_0": "未知",
+		"_1":"本站起飞",
+		"_2":"本站到达",
+		"_3":"开始登机",
+		"_4":"催促登机",
+		"_5":"登机口关闭（结束登机）",
+		"_6":"过站登机",
+		"_7":"延误",
+		"_8":"取消",
+		"_9":"前方起飞",
+		"_10":"备降",
+		"_11":"返航",
+		"_12":"值机开始",
+		"_13":"值机截止"
 	};
 
 	// 航空公司

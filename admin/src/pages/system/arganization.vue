@@ -138,6 +138,7 @@ export default {
         reflesh(){
             var self = this;
             self.getList(true);
+            self.isUser = true;
         },
         hideModal(){
             var self = this;

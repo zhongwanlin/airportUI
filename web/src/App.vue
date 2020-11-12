@@ -1,9 +1,21 @@
-<template>
-  <div id="app">
-    <router-view />
-  </div>
-</template>
+<script>
+	export default {
+		onLaunch: function(option) {
+			let self = this;
+			
+
+		},
+		onShow: function(option) {
+			
+		},
+		onHide: function() {
+			console.log("App Hide");
+		},
+	};
+</script>
 
 <style lang="less">
-@import "~@/common/unit.less";
+ @import "~@/common/common.less";
 </style>
+
+

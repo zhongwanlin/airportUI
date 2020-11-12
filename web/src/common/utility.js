@@ -1,4 +1,4 @@
-import config from './config';
+
 var utility = (function (utility) {
 	// 获取查询字符串参数
 	utility.getQueryParams = function (href) {
