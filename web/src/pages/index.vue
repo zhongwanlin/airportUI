@@ -28,14 +28,14 @@
 			</view>
 			<div class="tagcloudWrap">
 				<div class="tagcloud">
-					<span>“有什么好吃的”</span>
-					<span>“停车场收费”</span>
-					<span>“医疗室在哪”</span>
-					<span>“南航 7645”</span>
-					<span>“买礼物”</span>
-					<span>“预约大巴”</span>
-					<span>“哪些东西不能带上飞机”</span>
-					<span>“我的航班”</span>
+					<span>“有什么好吃的”<i class="triangle-down"></i></span>
+					<span>“停车场收费”<i class="triangle-down"></i></span>
+					<span>“医疗室在哪”<i class="triangle-down"></i></span>
+					<span>“南航 7645”<i class="triangle-down"></i></span>
+					<span>“买礼物”<i class="triangle-down"></i></span>
+					<span>“预约大巴”<i class="triangle-down"></i></span>
+					<span>“哪些东西不能带上飞机”<i class="triangle-down"></i></span>
+					<span>“我的航班”<i class="triangle-down"></i></span>
 				</div>
 			</div>
 		</view>
