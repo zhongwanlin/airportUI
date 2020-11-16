@@ -1,209 +1,147 @@
 <template>
     <view class="content">
 
-        <view class="header">
-			<view class="box">
-				<view class="nav">
-					<image style="width: 60px;height: 60px;" src="../static/icon06.png"></image>
-				</view>
-				<view class="icon">
-					<image style="width: 80px;height: 80px;" src="../static/icon05.png"></image>
-				</view>
-				<view class="label">
-					<text>说“刷脸”享受专属服务</text>
-				</view>
-			</view>
-		</view>
+        <!-- 头部组件 -->
+        <Header/>
 
-        <view class="mainWrap">
-			<view class="title">
-				<view class="label">嗨，我是小美，</view>
-				<view class="label">您的语音小助手。</view>
-			</view>
-			<view class="info">我懂得可多了，号称百事通，快来问我吧！</view>
-			
-			<view class="bgWrap">
-				<image style="width: 750px;height: 760px;" src="../static/bg.png"></image>
-				<view class="voiceGif"><image class="imgGif" style="width: 300px;height: 200px;" src="../static/yuyin.gif"></image></view>
-			</view>
-			<div class="tagcloudWrap">
-				<div class="tagcloud">
-					<span>“有什么好吃的”<i class="triangle-down"></i></span>
-					<span>“停车场收费”<i class="triangle-down"></i></span>
-					<span>“医疗室在哪”<i class="triangle-down"></i></span>
-					<span>“南航 7645”<i class="triangle-down"></i></span>
-					<span>“买礼物”<i class="triangle-down"></i></span>
-					<span>“预约大巴”<i class="triangle-down"></i></span>
-					<span>“哪些东西不能带上飞机”<i class="triangle-down"></i></span>
-					<span>“我的航班”<i class="triangle-down"></i></span>
-				</div>
-			</div>
-		</view>
+        <!-- 语音 -->
+        <Content/>
 
-        <view class="footer">
-            <view class="listWrap">
-                <view class="list">
-                    <view class="item">
-						<view class="wrap">
-							<view class="icon">
-								<image style="width: 80px;height: 80px;" src="../static/icon01.png"></image>
-							</view>
-							<view class="label">
-								<text>航班查询</text>
-							</view>
-						</view>
-                    </view>
-                    <view class="item">
-						<view class="wrap">
-							<view class="icon">
-								<image style="width: 80px;height: 80px;" src="../static/icon02.png"></image>
-							</view>
-							<view class="label">
-								<text>旅客指南</text>
-							</view>
-						</view>
-                    </view>
-                </view>
-                <view class="list">
-                    <view class="item">
-						<view class="wrap">
-							<view class="icon">
-								<image style="width: 80px;height: 80px;" src="../static/icon03.png"></image>
-							</view>
-							<view class="label">
-								<text>交通信息</text>
-							</view>
-						</view>
-                    </view>
-                    <view class="item">
-						<view class="wrap">
-							<view class="icon">
-								<image style="width: 80px;height: 80px;" src="../static/icon04.png"></image>
-							</view>
-							<view class="label">
-								<text>机场商业</text>
-							</view>
-						</view>
-                    </view>
-                </view>
-            </view>
-        </view>
+        <!-- 航班信息 -->
+        <FrightInfo/>
 
-        <!-- 紧急预案处理 -->
-        <template v-if="isOnline">
-            <view class="onlineWrap">
-                <template v-if="errorImgList.length>0">
-                    <swiper :indicator-dots="true" :autoplay="true" :interval="2000" :duration="500" :style="{height: systemInfo.screenHeight+'px'}">
-                        <template v-for="(item, index) in errorImgList">
-                            <swiper-item :key="index" :style="{height: systemInfo.screenHeight+'px'}">
-                                <view :style="{height: systemInfo.screenHeight+'px'}">
-                                    <img :src="item" :style="{height: systemInfo.screenHeight+'px'}"/>
-                                </view>
-                            </swiper-item>
-                        </template>
-                    </swiper>
-                </template>
-                <template v-else>
-                    <img :src="errorImg"/>
-                </template>
-            </view>
-        </template>
+        <!-- 底部 -->
+        <Footer/>
+        
+        <!-- 应急预案组件 -->
+        <Error/>
+		
     </view>
 </template>
 
 <script>
-import error from "../common/error";
-import tagcloud from '../common/tagcloud.js';
+import {
+    mapState,
+    mapMutations
+} from 'vuex';
+import Error from "@/components/error.vue";
+import Header from "@/components/header.vue";
+import Content from "@/components/content.vue";
+import FrightInfo from "@/components/frightInfo.vue";
+import Footer from "@/components/footer.vue";
 export default {
     components: {
-
+        Error,
+        Header,
+        Content,
+        FrightInfo,
+        Footer
     },
     data() {
         return {
 			userInfo: null,
 			locale: "",
-			isOnline: false,
-			errorImg: error.errorImg,
-			errorImgList: [],
-			emergencyList: [],
-			flightNo: "",
-			flightList: [],
 			voiceTxtShow: "",
-            paramsInfo: {},
+            voiceTxtInfo: [],
+            isLog: false,
             systemInfo: uni.getSystemInfoSync(),
         };
     },
+    computed: {
+        ...mapState(["isFright", "flightList", "frightInfo"])
+    },
     watch: {
-
-    },
-    onLoad() {
-        let self = this;
-		
-		
-    },
-    onShow() {
-        let self = this;
-    },
-    onReachBottom() {},
-	onShareAppMessage(){},
-	onShareTimeline(){},
-    methods: {
-        // 获取应急预案
-        getEmergencyList(){
-            var self = this;
-            uni.request({
-			    headers: {
-                    gomstoken: "866822030391163"
-                },
-                url: self.$config.action.emergencyList,
-			    method: "GET",
-			    data: {
-					"pageNum": 1,
-                    "pageSize": 1000,
-                    "name": "",
-                    "dep_status": "",
-			    },
-			    success(res, statusCode, header) {
-					self.errorImgList = [];
-                    for(var i = 0, len = res.data.list.length; i < len; i++) {
-                        if(res.data.list[i]["status"] == 1) {
-                            self.emergencyList = JSON.parse(res.data.list[i]["url"]);
-                            break;
-                        }
-                    }
-                    self.emergencyList.forEach(item => {
-                        self.$utility.convertImgToBase64(item,(dataURL)=>{
-                            self.errorImgList.push(dataURL);
-                        });
-                    });
-			    },
-			    fail(error) {
-			        console.log(error);
-			        uni.hideLoading();
-			    }
-            });
-            
+		voiceTxtShow(value){
+            let self = this;
+            if(value.length > 0) {
+                uni.hideLoading();
+                self.flightSearch();
+            }
         },
+        isFright(value){
+            let self = this;
+            if(value == false) {
+                clearInterval(window.appInfo["_2"]["intervalTime"]);
+                window.appInfo["_2"]["txtToVoice"]("请说出您要找的航班");
+            }
+        }
+    },
+    methods: {
+        ...mapMutations(["setIsFright", "setFlightList", "setFrightInfo", "setIsLoading"]),
 
         // 获取航班
         flightSearch(){
             var self = this;
 
+            self.setIsLoading(false);
+            uni.showLoading({
+                title: '获取航班信息...'
+            });
+
             uni.request({
-			    headers: {
+			    header: {
                     gomstoken: "866822030391163"
                 },
-                url: self.$config.action.flightSearch,
-			    method: "GET",
+                url: self.$config.action.terminalVoice,
+			    method: "POST",
 			    data: {
-					"flightNo": self.flightNo
+					"content": (self.voiceTxtShow.split("time")[0]).replace(/@"\p{P}|\s"/g,"")||""
 			    },
 			    success(res, statusCode, header) {
-					self.errorImgList = res.data;
+                    let list = [];
+                    uni.hideLoading();
+                    uni.hideToast();
+                    if(res.data.code == 0) {
+                        if(res.data.data.data.length > 0) {
+                            res.data.data.data.forEach((item)=>{
+                                let plan_open_time = self.$utility.getCurrentTimeInfo(item.plan_open_time);
+                                let plan_end_time = self.$utility.getCurrentTimeInfo(item.plan_end_time);
+                                let real_open_time = self.$utility.getCurrentTimeInfo(item.real_open_time);
+                                let real_end_time = self.$utility.getCurrentTimeInfo(item.real_end_time);
+                                
+                                let plan_take_off = self.$utility.getCurrentTimeInfo(item.plan_take_off);
+                                let real_take_off = self.$utility.getCurrentTimeInfo(item.real_take_off);
+
+                                let plan_landing_time = self.$utility.getCurrentTimeInfo(item.plan_landing_time);
+                                let real_landing_time = self.$utility.getCurrentTimeInfo(item.real_landing_time);
+                                let alter_landing_time = self.$utility.getCurrentTimeInfo(item.alter_landing_time);
+                                
+                                list.push({
+                                    "plan_end_time": plan_end_time.hour+":"+plan_end_time.min,//	int	计划结束登机时间
+                                    "plan_gate_name": item.plan_gate_name,//	string	计划登机口
+                                    "plan_open_time":  plan_open_time.hour+":"+plan_open_time.min,//	int	计划开始登机时间
+                                    "plan_take_off":  plan_take_off.hour+":"+plan_take_off.min,//	int	计划起飞时间
+                                    "real_end_time": real_end_time.hour+":"+real_end_time.min,//	int	实际结束登机时间
+                                    "real_gate_name": item.real_gate_name,//	string	实际登机口
+                                    "real_open_time": real_open_time.year+"/"+real_open_time.month+"/"+real_open_time.date+" "+real_open_time.hour+":"+real_open_time.min+":"+real_open_time.second,//	int	实际开始登机时间
+                                    "real_take_off": real_take_off.hour+":"+real_take_off.min,//	int	实际起飞时间
+                                    "route_cn_list": item.route_cn_list,//	string list	中文航线，城市用-连接
+                                    "route_en_list": item.route_en_list,//	string list	英文航线，城市用-连接
+                                    "route_code_list": item.route_code_list,//	string list	机场三字码，用-连接
+                                    "status": item.status,//	int	0: 未知；1：本站起飞；2：本站到达；3：开始登机；4：催促登机；5：登机口关闭（结束登机）；6：过站登机 7：延误；8：取消，9：前方起飞， 10：备降， 11：返航 ， 12：值机开始 ， 13： 值机截止
+                                    "exit_gate": item.exit_gate,//	string	航班出口
+                                    "plan_landing_time": plan_landing_time.hour+":"+plan_landing_time.min,//	int	计划降落时间
+                                    "alter_landing_time": alter_landing_time.hour+":"+alter_landing_time.min,//	int	修改降落时间
+                                    "real_landing_time": real_landing_time.hour+":"+real_landing_time.min,//	int	实际降落时间
+                                    "terminal": item.terminal,//	string	航站楼
+                                    "flight_no": item.flight_no,//	string	航站楼
+                                });
+                            });
+                            self.setFlightList(list);
+                            self.setFrightInfo(list[0]);
+                            self.setIsFright(true);
+                            clearInterval(window.appInfo["_2"]["intervalTime"]);
+                        } 
+                    } else {
+                        clearInterval(window.appInfo["_2"]["intervalTime"]);
+                        window.appInfo["_2"]["txtToVoice"](res.data.msg);
+                    }
 			    },
 			    fail(error) {
 			        console.log(error);
-			        uni.hideLoading();
+                    uni.hideLoading();
+                    uni.hideToast();
+                    window.appInfo["_2"]["userVoice"]();
 			    }
             });
 
@@ -215,6 +153,7 @@ export default {
                 1,
                 JSON.stringify({}),
                 function (res) {
+                    alert(res);
                     window.appInfo["_1"] = JSON.parse(res);
                     window.utility.setLocalStorage(
                         "gomstoken", (window.appInfo["_1"]["imei"] || "866822030391163")
@@ -277,7 +216,7 @@ export default {
                 4,
                 JSON.stringify({}),
                 function (res) {
-                    // alert("扫身份证："+res);
+                    alert("扫身份证："+res);
                     // var demoMatch = window.mock.demoMatch;
                     // var info = {
                     //     code: demoMatch[Math.floor(Math.random()*demoMatch.length)] || "CZ3337",
@@ -336,29 +275,21 @@ export default {
             let self = this;
             return function(){
                 if(!!window.jsBridge) {
+                    self.setIsLoading(true);
                     window.jsBridge.hxpApi(
                         5,
                         JSON.stringify({}),
                         function (res) {
-                            var bool = true;
                             var voiceStr = JSON.parse(res)["voiceStr"];
-                            let voiceTxtInfo = "";
-                            clearTimeout(window.appInfo["_2"]["intervalTime"]);
-                            clearTimeout(window.appInfo["_2"]["overVoice2"]);
-                            clearTimeout(window.appInfo["_2"]["overVoice3"]);
-                            window.appInfo["_2"]["setShowVoiceTxtInfo"]("");
-                            window.appInfo["_2"]["overVoice2"] = setTimeout(()=>{
-                                window.appInfo["_2"]["setVoiceTxtInfo"]("", false);
-                            }, 2000);
-                            window.appInfo["_2"]["overVoice3"] = setTimeout(()=>{
-                                voiceTxtInfo = window.appInfo["_2"]["setVoiceTxtInfo"](voiceStr, true);
-                                window.appInfo["_2"]["setVoiceTxt"]("");
-                                window.appInfo["_2"]["setShowVoiceTxtInfo"](voiceStr);
-                            }, 0);
-
-                            if(voiceStr.length != 0) {
-                                
-                            }
+                            window.uni.hideToast();
+                            window.uni.showToast({
+                                title: voiceStr,
+                                icon: "none",
+                                duration: 3000
+                            });
+                            setTimeout(function() {
+                                window.appInfo["_2"]["setShowVoiceTxtInfo"](voiceStr.replace(/@"\p{P}"/g,"")+'time'+Date.parse(new Date()));
+                            }, 500);
                         }.toString()
                     );
                 }
@@ -373,9 +304,7 @@ export default {
                     window.jsBridge.hxpApi(
                         10,
                         JSON.stringify({}),
-                        function (res) {
-                            alert(res);
-                        }.toString()
+                        function (res) {}.toString()
                     );
                 }
             };
@@ -386,54 +315,26 @@ export default {
             let self = this;
     
             return function(txt) {
-                if(!!window.jsBridge && self.isShowDetail==false) {
+                if(!!window.jsBridge) {
+                    let time = txt.length/4;
                     window.jsBridge.hxpApi(
                         11,
                         JSON.stringify(
                             {"ctx": txt, speed: 7}
                         ),
-                        function (res) {}.toString()
+                        function (res) {
+                            setTimeout(()=>{
+                                window.appInfo["_2"]["userVoice"]();
+                            }, 100);
+                            clearInterval(window.appInfo["_2"]["intervalTime"]);
+                            window.appInfo["_2"]["intervalTime"] = setInterval(()=>{
+                                window.appInfo["_2"]["userVoice"]();
+                            }, 8000);
+                        }.toString()
                     );
 
-                    setTimeout(()=>{
-                        window.appInfo["_2"]["stopVoice"]();
-                    }, 1000);
-                    
-                    clearTimeout(window.appInfo["_2"]["userVoiceIntervl"]);
-                    window.appInfo["_2"]["userVoiceIntervl"] = setTimeout(()=>{
-                        window.appInfo["_2"]["userVoice"]();
-                        window.appInfo["_2"]["writeLog"]();
-                    }, txt.length/4*1000);
-
-                    clearTimeout(window.appInfo["_2"]["overVoice1"]);
-                    window.appInfo["_2"]["overVoice1"] = setTimeout(()=>{
-                        window.appInfo["_2"]["setVoiceTxtInfo"]("", false);
-                        window.appInfo["_2"]["setShowVoiceTxtInfo"]("");
-                        window.appInfo["_2"]["setVoiceTxt"]("欢迎使用语音助手,请说出您要找的服务");
-                    }, txt.length/4*1000+5000);
-                    
                 }
             };
-        },
-
-        // 显示返回的结果
-        setVoiceTxt(){
-            let self = this;
-            return function(txt) {
-                self.htmlTxt = txt;
-            }
-        },
-
-        setVoiceTxtInfo(){
-            let self = this;
-            return function(txt, bool) {
-                if(bool == true) {
-                    self.voiceTxtInfo.push(txt); 
-                } else {
-                    self.voiceTxtInfo = [];
-                }
-                return self.voiceTxtInfo;
-            }
         },
 
         // 设置显示在页面上的数据
@@ -444,65 +345,13 @@ export default {
             }
         },
 
-        // 把语音数据提交到服务器
-        uploadVoice(){
-            let self = this;
-            return function(voiceInfo) {
-                var xmlHttp = new XMLHttpRequest();
-                var formData = new FormData();
-                formData.append("content", voiceInfo);
-                window.appInfo["_2"]["setShowVoiceTxtInfo"]("");
-                xmlHttp.onreadystatechange = function () {
-                    if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-                        var data = xmlHttp.responseText;
-                        var jsonData = JSON.parse(data);
-                        if (jsonData.code == 0) {
-                            if(window.appInfo["_2"]["tips"] != jsonData.data.reply_content) {
-                                window.appInfo["_2"]["tips"] = jsonData.data.reply_content;
-                                window.appInfo["_2"]["txtToVoice"](jsonData.data.reply_content);
-                                window.appInfo["_2"]["voiceInfo"] = jsonData.data.reply_content;
-                            }
-                            window.appInfo["_2"]["setVoiceTxt"](jsonData.data.reply_content);
-                            if(!!jsonData.data.action_data.jump_url) {
-                                window.appInfo["_2"]["getArticle"]({id: parseInt(jsonData.data.action_data.jump_url)});
-                            }
-                        } else {
-                            window.appInfo["_2"]["setVoiceTxtInfo"]("", false);
-                            if(window.appInfo["_2"]["errorNum"] == 0) {
-                                window.appInfo["_2"]["errorNum"]++;
-                                window.appInfo["_2"]["txtToVoice"]("抱歉,暂时没有找到您想要的服务");
-                            }
-                        }
-                    }
-                }
-                xmlHttp.open("POST", self.$config.action.asp, true);
-                xmlHttp.setRequestHeader("gomstoken", window.utility.getLocalStorage('gomstoken'));
-                xmlHttp.send(formData);
-            };
-        },
-
         init(){
             let self = this;
             return function() {
                 self.userCamera(self); // 使用摄像头
                 self.$utility.setSessionStorage("faceInfo", null);
             };
-        },
-
-        // 判断网络状态
-        onLine(){
-            let self = this;
-            var img = new Image();
-            // img.src = self.$config.hostName + "/assets/error.png?t" + Date.now();
-            img.src = "http://air.cityeasyplay.com:8080/terminal/static/中国1.png?t" + Date.now();
-            console.log(img.src);
-            img.onload=function(){
-                self.isOnline = false;       
-            };
-            img.onerror=function(){
-                self.isOnline = true;     
-            };
-        }	
+        },	
 
 	},
 	created() {
@@ -511,14 +360,10 @@ export default {
         self.locale = self.$i18n.locale;
 
         window.appInfo["_0"]["init"] = self.init();
-
-        // 语音模块
         window.appInfo["_2"]["userVoice"] = self.userVoice(); // 使用语音模块
         window.appInfo["_2"]["stopVoice"] = self.stopVoice(); // 停止语音模块
-        window.appInfo["_2"]["setVoiceTxt"] = self.setVoiceTxt(); // 把语音转换成文字 
-        window.appInfo["_2"]["setVoiceTxtInfo"] = self.setVoiceTxtInfo(); // 拼接语音内容
+        window.appInfo["_2"]["setShowVoiceTxtInfo"] = self.setShowVoiceTxtInfo(); // 拼接语音内容
         window.appInfo["_2"]["txtToVoice"] = self.txtToVoice(); // 文字转语音
-        window.appInfo["_2"]["uploadVoice"] = self.uploadVoice(); // 提交语音内容到后台
         window.appInfo["_2"]["intervalTime"] = null;
         window.appInfo["_2"]["overVoice1"] = null;
         window.appInfo["_2"]["overVoice2"] = null;
@@ -529,44 +374,29 @@ export default {
 
         if (!!window.jsBridge) {
            // 获取设备信息
-            self.getTerminalInfo();
-
-            // 人脸识别
+            // self.getTerminalInfo();
+			
+			// 文字转语音
+			window.appInfo["_2"]["txtToVoice"]("请说出您要找的航班，比如HU708");
+			
+            // // 人脸识别
             // self.userCamera(self);
 
-            // 扫机票
+            // // 扫机票
             // self.sweepTicket();
             
-            // 扫身份证
+            // // 扫身份证
             // self.scanIDCard();
         }
 
-        // 获取航班
-        self.flightSearch();
-
-        // 预案处理
-        self.getEmergencyList();
-        setInterval(()=>{
-            self.onLine();
-        }, 5000);
     },
 	mounted() {
 		let self = this;
-		setTimeout(()=>{
-			let tagcloudFun = tagcloud({
-				selector: ".tagcloud",//元素选择器
-				fontsize: 32,//基本字体大小, 单位px
-				radius: self.systemInfo.screenWidth/4,//滚动半径, 单位px
-				mspeed: "slow",//滚动最大速度, 取值: slow, normal(默认), fast
-				ispeed: "slow",//滚动初速度, 取值: slow, normal(默认), fast
-				direction: 0,
-				keep: true //鼠标移出组件后是否继续随鼠标滚动, 取值: false, true(默认) 对应 减速至初速度滚动, 随鼠标滚动
-			});
-		}, 1500);
 	},
 };
 </script>
 
 <style lang="less" scoped>
 @import "~@/common/common.less";
+
 </style>

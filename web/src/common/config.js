@@ -1,12 +1,23 @@
 const config = (function (config) {
-	config.imgPath = "http://47.106.235.8:8888/";
-	config.assets = "http://47.106.235.8:8888/assets/";
+	// // config.pageUrl = "http://47.106.235.8:8889/"; // 测试
+	// // config.assets = "http://47.106.235.8:8888/assets/"; // 测试
+	// // 测试环境
+	// if (process.env.NODE_ENV === 'development') {
+	// 	// config.hostName = "http://47.106.235.8:8888"; // 测试
+	// 	console.log("development");
+	// } else if (process.env.NODE_ENV === 'production') {
+	// 	// config.hostName = "http://47.106.235.8:8888"; // 测试
+	// 	console.log("production");
+	// }
+
+	config.pageUrl = "http://10.40.21.86:9999/"; // 现网
+	config.assets = "http://10.40.21.86:8888/assets/"; // 现网
 	// 测试环境
 	if (process.env.NODE_ENV === 'development') {
-		config.hostName = "http://47.106.235.8:8888";
+		config.hostName = "http://10.40.21.86:8888";// 现网
 		console.log("development");
 	} else if (process.env.NODE_ENV === 'production') {
-		config.hostName = "http://47.106.235.8:8888";
+		config.hostName = "http://10.40.21.86:8888"; // 现网
 		console.log("production");
 	}
 
@@ -25,23 +36,67 @@ const config = (function (config) {
 		"flightSearch": config.hostName + "/api/flight/search", // 航班查询
 
 		"emergencyList": config.hostName+"/sys/emergency/list", // 版本列表
+		
+		"terminalVoice": config.hostName+"/api/terminal/voice", // web-语音文字处理
 	};
 
 	config.status = {
-		"_0": "未知",
-		"_1":"本站起飞",
-		"_2":"本站到达",
-		"_3":"开始登机",
-		"_4":"催促登机",
-		"_5":"登机口关闭（结束登机）",
-		"_6":"过站登机",
-		"_7":"延误",
-		"_8":"取消",
-		"_9":"前方起飞",
-		"_10":"备降",
-		"_11":"返航",
-		"_12":"值机开始",
-		"_13":"值机截止"
+		"_0": {
+			"name": "未知",
+			"color": "",
+		},
+		"_1":{
+			"name": "本站起飞",
+			"color": "green",
+		},
+		"_2":{
+			"name":"本站到达",
+			"color": "green",
+		},
+		"_3":{
+			"name": "开始登机",
+			"color": "green",
+		},
+		"_4":{
+			"name":"催促登机",
+			"color": "orange",
+		},
+		"_5":{
+			"name": "登机口关闭（结束登机）",
+			"color": "blue",
+		},
+		"_6":{
+			"name": "过站登机",
+			"color": "blue",
+		},
+		"_7":{
+			"name": "延误",
+			"color": "red",
+		},
+		"_8":{
+			"name": "取消",
+			"color": "red",
+		},
+		"_9":{
+			"name": "前方起飞",
+			"color": "blue",
+		},
+		"_10":{
+			"name": "备降",
+			"color": "green",
+		},
+		"_11":{
+			"name": "返航",
+			"color": "yellow",
+		},
+		"_12":{
+			"name": "值机开始",
+			"color": "",
+		},
+		"_13":{
+			"name": "值机截止",
+			"color": "blue",
+		},
 	};
 
 	// 航空公司

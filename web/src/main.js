@@ -1,15 +1,18 @@
 import Vue from 'vue';
 import VueI18n from 'vue-i18n';
 import App from './App';
+import store from './store';
 import config from './common/config';
 import utility from './common/utility';
 import mock from "./common/mock";
 import zhCN from './common/lang/zh-CN';
 import enUS from './common/lang/en-US';
+import 'animate.css';
 Vue.use(VueI18n);
 
 Vue.config.productionTip = false;
 Vue.prototype.$utility = utility;
+Vue.prototype.$store = store;
 Vue.prototype.$config = config;
 Vue.prototype.$mock = mock;
 
@@ -23,6 +26,7 @@ const i18n = new VueI18n({
 });
 // 处理与app的交互数据
 window.utility = utility;
+window.uni = uni;
 window.mock = mock;
 window.appInfo = {
   "_0": {}, // 设备数据
@@ -35,6 +39,7 @@ window.appInfo = {
 };
 
 const app = new Vue({
+	store,
 	config,
 	utility,
 	i18n,
