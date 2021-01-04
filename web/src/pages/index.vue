@@ -716,11 +716,11 @@ export default {
 
             // self.setSuggestAnswer({
             //     type: 2,
-            //     suggestAnswer: "嗨，我是首都机场语音小助手"
+            //     suggestAnswer: "嗨，我是机场语音小助手"
             // });
 
             // // 文字转语音
-            // window.appInfo["_2"]["txtToVoice"]("嗨，我是首都机场语音小助手");
+            // window.appInfo["_2"]["txtToVoice"]("嗨，我是机场语音小助手");
 
             // // 人脸识别
             // self.userCamera(self);
