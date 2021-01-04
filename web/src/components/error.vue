@@ -1,22 +1,12 @@
 <template>
     <view>
-        <!-- 紧急预案处理 -->
         <template v-if="isOnline">
+            <view class="onlineMarsker"></view>
             <view class="onlineWrap">
-                <template v-if="errorImgList.length>0">
-                    <swiper :indicator-dots="true" :autoplay="true" :interval="2000" :duration="500" :style="{height: systemInfo.screenHeight+'px'}">
-                        <template v-for="(item, index) in errorImgList">
-                            <swiper-item :key="index" :style="{height: systemInfo.screenHeight+'px'}">
-                                <view :style="{height: systemInfo.screenHeight+'px'}">
-                                    <img :src="item" :style="{height: systemInfo.screenHeight+'px'}"/>
-                                </view>
-                            </swiper-item>
-                        </template>
-                    </swiper>
-                </template>
-                <template v-else>
-                    <img :src="errorImg"/>
-                </template>
+                <view class="errorWrap">
+                    <view class="errorTitle"><text>网络故障</text></view>
+                    <view class="errorTitle"><text>{{timeNum}}秒后自动退出</text></view>
+                </view>
             </view>
         </template>
     </view>
@@ -28,74 +18,72 @@ export default {
     components: {},
     data() {
         return {
-			isOnline: false,
+            isOnline: false,
+            timeNum: 15,
+            timeInterval: null,
 			errorImg: error.errorImg,
 			errorImgList: [],
 			emergencyList: [],
             systemInfo: uni.getSystemInfoSync(),
         };
     },
-    methods: {
-        // 获取应急预案
-        getEmergencyList(){
+    watch: {
+        isOnline(value){
             var self = this;
-            uni.request({
-			    header: {
-                    gomstoken: "866822030391163"
-                },
-                url: self.$config.action.emergencyList,
-			    method: "GET",
-			    data: {
-					"pageNum": 1,
-                    "pageSize": 1000,
-                    "name": "",
-                    "dep_status": "",
-			    },
-			    success(res, statusCode, header) {
-					self.errorImgList = [];
-                    for(var i = 0, len = res.data.list.length; i < len; i++) {
-                        if(res.data.list[i]["status"] == 1) {
-                            self.emergencyList = JSON.parse(res.data.list[i]["url"]);
-                            break;
-                        }
+            if(value == true) {
+                self.timeInterval = setInterval(()=>{
+                    self.timeNum--;
+                    if(self.timeNum <= 0) {
+                        self.timeNum = 0; 
+                        self.backActionNav();
                     }
-                    self.emergencyList.forEach(item => {
-                        self.$utility.convertImgToBase64(item,(dataURL)=>{
-                            self.errorImgList.push(dataURL);
-                        });
-                    });
-			    },
-			    fail(error) {
-			        console.log(error);
-			        uni.hideLoading();
-			    }
-            });
-            
+                }, 1000);
+            } else {
+                self.timeNum = 15;
+                clearInterval(self.timeInterval);
+            }
+        }
+    },
+    methods: {
+        backActionNav() {
+            if (!window.jsBridge) {
+                return;
+            }
+            window.jsBridge.hxpApi(
+                13,
+                JSON.stringify({}),
+                function (res) {
+                    alert('按下物理返回键');
+                }.toString()
+            );
         },
         // 判断网络状态
         onLine(){
             let self = this;
             var img = new Image();
-            img.src = self.$config.pageUrl + "static/icon06.png?t=" + Date.now();
-            console.log(img.src);
+            img.src = self.$config.pageUrl + "static/favicon.ico?t=" + Date.now();
             img.onload=function(){
-                self.isOnline = false;       
+                self.isOnline = false; 
+                self.timeNum = 15;
+                clearInterval(self.timeInterval);      
             };
             img.onerror=function(){
-                self.isOnline = true;     
+                console.log(self.isOnline);
+                self.isOnline = true;
+                self.onLine();   
             };
         }	
 	},
 	created() {
         let self = this;
-        window.airport = self.$config.airport;
-        self.locale = self.$i18n.locale;
+        // window.airport = self.$config.airport;
+        // self.locale = self.$i18n.locale;
 
         // 预案处理
-        self.getEmergencyList();
+        // self.getEmergencyList();
         setInterval(()=>{
             self.onLine();
-        }, 10000);
+        }, 15000);
     },
 	mounted() {
 		let self = this;
@@ -105,15 +93,39 @@ export default {
 
 <style lang="less" scoped>
 @import "~@/common/common.less";
-.onlineWrap {
+.onlineMarsker {
     position: fixed;
-    z-index: 10000000000;
+    z-index: 100000000;
     left: 0;
     right: 0;
     top: 0;
     bottom: 0;
-    width: 100%;
-    height: 100%;
+    background-color: rgba(0, 0, 0, .6);
+}
+.onlineWrap {
+    position: fixed;
+    z-index: 10000000000;
+    left: 10%;
+    right: 10%;
+    top: 10%;
+    bottom: 10%;
+    // background-color: #deedfd;
+    // border-radius: 20px;
+    // box-shadow: 0 0 20px rgba(0, 0, 0, .25);
+    .errorWrap {
+        margin-top: 50%;
+        line-height: 1;
+        .errorTitle {
+            font-size: 64px;
+            text-align: center;
+            line-height: 1;
+            text {
+                padding: 0 20px;
+                color: #fff;
+                background-color: red;
+            }
+        }
+    }
     img {
         width: 100%;
         height: 100%;

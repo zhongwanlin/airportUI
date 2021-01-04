@@ -108,18 +108,8 @@
         "usingComponents" : true
     },
     "h5" : {
-        "template" : "template.h5.html",
         "router" : {
-            "mode" : "hash",
-            "base" : "/"
-        },
-        "sdkConfigs" : {
-            "maps" : {
-                "qqmap" : {
-                    "key" : ""
-                }
-            }
-        },
-        "title" : "首都机场终端"
+            "base" : "/ht"
+        }
     }
 }

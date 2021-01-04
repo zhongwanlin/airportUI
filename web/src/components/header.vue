@@ -1,42 +1,35 @@
 <template>
     <view>
+        <template v-if="isTime">
+            <text class="timeNum">({{timeNum}})秒后自动退出</text>
+        </template>
         <view class="header">
+            
 			<view class="box">
-				<view class="nav">
+				<view class="nav" @click="backActionNav">
 					<image :style="{width: systemInfo.screenWidth<=1024?'30px':'60px',height:systemInfo.screenWidth<=1024?'30px':'60px'}" src="../static/icon06.png"></image>
+                    <text class="backInfo">返回</text>
 				</view>
-                <!-- <text class="wellcome">欢迎来到北京首都机场</text> -->
-				<view class="icon" @click="isOpen=!isOpen">
+				<view class="icon">
 					<image :style="{width: systemInfo.screenWidth<=1024?'30px':'80px',height:systemInfo.screenWidth<=1024?'30px':'80px'}" src="../static/icon05.png"></image>
 				</view>
-				<view class="label" @click="isOpen=!isOpen">
-					<text>{{passenger}}</text>
+				<view class="label">
+					<text>航班查询</text>
 				</view>
 			</view>
 		</view>
 
-        <template v-if="isOpen">
-            <view class="swichPage">
-                <view class="list">
-                    <view class="item item1" @click="setType('出发旅客（国内）')">
-                        <text>我是出发旅客（国内）</text>
-                    </view>
-                    <view class="item item2" @click="setType('国际/港澳台')">
-                        <text>我是出发旅客（国际/港澳台）</text>
-                    </view>
-                    <view class="item item3" @click="setType('到达旅客')">
-                        <text>我是到达旅客</text>
-                    </view>
-                    <view class="item item4" @click="setType('中转旅客')">
-                        <text>我是中转旅客</text>
-                    </view>
-                    <view class="item item5" @click="setType('接送机')">
-                        <text>我来接送机</text>
-                    </view>
-                    <view class="close" @click="closeType">X</view>
+        <template v-if="isSubTime">
+            <view class="showModalMasker"></view>
+            <view class="showModal">
+                <view class="tipsInfo">{{timeSubNum}} 秒后退出</view>
+                <view class="btnList">
+                    <view class="btnItem" @click="cancelAction">取消</view>
+                    <view class="btnItem" @click="backActionNav">确定</view>
                 </view>
             </view>
         </template>
+
     </view>
 </template>
 
@@ -53,42 +46,192 @@ export default {
         return {
             locale: "",
             isOpen: false,
+            isTime: false,
+            isSubTime: false,
+            timeNum: 30,
+            timeInterval: null,
+            timeOut: null,
+            timeSubInterval: null,
+            timeSubNum: 5,
+            worker: null,
             systemInfo: uni.getSystemInfoSync(),
         };
     },
+    watch: {
+        isLoading(value){
+            let self = this;
+            self.timeNum = 30;
+            self.isTime = false;
+
+            clearInterval(self.timeInterval);
+            clearInterval(self.timeSubInterval);
+            clearInterval(self.timeOut);
+            self.setIsNoInput(false);
+
+            if(!!self.worker) {
+                self.worker.postMessage('stop');
+                self.worker = null;
+            }
+
+            if(value == true) {
+               self.doTimeCountAction();
+            }
+        }
+    },
     computed: {
-        ...mapState(["passenger"])
+        ...mapState(["passenger", "isLoading", "isFright"])
     },
     methods: {
-        ...mapMutations(["setPassenger"]),
-        closeType() {
+        ...mapMutations(["setPassenger", "setIsNoInput"]),
+        refleshPage(){
             let self = this;
-            self.isOpen = false;
+            window.location.href = self.$config.pageUrl+"index.html?t=" + Date.parse(new Date());
         },
-        setType(type) {
+        // 关闭
+        backActionNav(){
             let self = this;
-            self.setPassenger(type);
-            self.closeType();
-            window.utility.setLocalStorage("type", type);
+            clearInterval(self.timeInterval);
+            clearInterval(self.timeSubInterval);
+            clearInterval(self.timeOut);
+            if(!!window.jsBridge) {
+                window.jsBridge.hxpApi(
+                    13,
+                    JSON.stringify({}),
+                    function (res) {
+
+                    }.toString()
+                );
+            }
+        },
+        // 取消退出
+        cancelAction(){
+            let self = this;
+            self.timeNum = 30;
+            self.timeSubNum = 5;
+            self.isTime = false;
+            self.isSubTime = false;
+            clearInterval(self.timeInterval);
+            clearInterval(self.timeSubInterval);
+            clearInterval(self.timeOut);
+            self.doTimeCountAction();
+        },
+        // 按下物理返回键
+        showbackModal() {
+            let self = this;
+            self.isSubTime = true;
+            self.timeSubInterval = setInterval(()=>{
+                if(self.timeSubNum != 0) {
+                    self.timeSubNum--;
+                }
+                if (self.timeSubNum <= 0) {
+                    clearInterval(self.timeSubInterval);
+                    self.backActionNav();
+                }
+            },1000);
+        },
+        // 执行倒计时
+        doTimeCountAction() {
+            let self = this;
+            let time = 60000;
+
+            if(self.isFright == true) {
+                time = 60000;
+            }
+
+            self.timeOut = setTimeout(()=>{
+                self.isTime = true;
+                self.worker = new Worker(self.$config.pageUrl+'static/worker.js');
+                self.worker.postMessage('start');
+                self.worker.onmessage = function (event) {
+                    if(self.timeNum != 0) {
+                        self.timeNum--;
+                    }
+                    if(self.timeNum <= 25) {
+                        self.setIsNoInput(true);
+                    }
+                    if (self.timeNum <= 0) {
+                        self.backActionNav();
+                        self.worker.postMessage('stop');
+                        self.worker.terminate();
+                    }
+                }
+                // self.isTime = true;
+                // self.timeInterval = setInterval(()=>{
+                //     if(self.timeNum != 0) {
+                //         self.timeNum--;
+                //     }
+                //     if(self.timeNum <= 25) {
+                //         self.setIsNoInput(true);
+                //     }
+                //     if (self.timeNum <= 0) {
+                //         self.backActionNav();
+                //     }
+                // },1000);
+            }, time);
+
         }
 	},
 	created() {
         let self = this;
-        let type = window.utility.getLocalStorage("type");
-        window.airport = self.$config.airport;
-        self.locale = self.$i18n.locale;
-        if(!type) {
-            self.isOpen = true;
-        }
+
+        // self.doTimeCountAction();
     },
 	mounted() {
-		let self = this;
+        let self = this;
 	},
 };
 </script>
 
 <style lang="less" scoped>
 @import "~@/common/common.less";
+.showModalMasker {
+	position: fixed;
+	z-index: 100000000000;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0,0,0,.5);
+}
+.showModal {
+    position: fixed;
+	z-index: 1000000000000;
+	left: 20%;
+	right: 20%;
+	top: 30%;
+	overflow-x: hidden;
+	overflow-y: auto;
+    background-color: #fff;
+    border-radius: 30px;
+    .tipsInfo {
+        padding: 40px 0;
+        text-align: center;
+        font-size: 48px;
+    }
+    .btnList {
+        display: flex;
+        padding: 20px;
+        .btnItem {
+            flex: 1;
+            text-align: center;
+            font-size: 36px;
+            &:last-child {
+                color: #4883f9;
+            }
+        }
+    }
+}
+.timeNum {
+    position: fixed;
+    z-index: 1000000000000000 !important;
+    font-size: 24px;
+    top: 10px;
+    left: 200px;
+    padding-left: 20px;
+    color: rgba(255, 255, 255, .7);
+}
 .header {
 	.box {
 		width: 90%;
@@ -99,7 +242,14 @@ export default {
 		overflow: hidden;
 		font-size: 32px;
 		padding: 10px 0;
-	}
+    }
+    .backInfo {
+        position: relative;
+        z-index: 0;
+        top: -5px;
+        padding-left: 20px;
+        font-size: 24px;
+    }
 	.wellcome {
 		display: inline-block;
 		padding-top: 20px;
@@ -110,8 +260,8 @@ export default {
 		position: relative;
 		z-index: 0;
 		top: 10px;
-		left: 20px;
-	}
+        left: 20px;
+    }
 	.label,
 	.icon {
 		float: right;
@@ -121,7 +271,7 @@ export default {
 		text {
 			position: relative;
 			z-index: 0;
-			top: 20px;
+			top: 0;
 		}
 	}
 }
@@ -187,7 +337,7 @@ export default {
 			text {
 				position: relative;
 				z-index: 0;
-				top: 10px;
+				top: 5px;
 			}
 		}
 	}
@@ -231,9 +381,15 @@ export default {
 	.header {
 		.label {
 			text {
-				top: 0;
+				top: 5px;
 			}
-		}
+        }
+        .nav {
+            .timeNum {
+                top: -8px;
+                padding-left: 10px;
+            }
+        }
     }
     .swichPage {
         .list {

@@ -2,21 +2,23 @@
     <view>
         <view class="mainWrap">
 			
-            <view class="title">
-				<view class="label">嗨，我是小美，</view>
+            <!-- <view class="title">
+				<view class="label">嗨，我是首都机场，</view>
 				<view class="label">您的语音小助手。</view>
 			</view>
-			<view class="info">我懂得可多了，号称百事通，快来问我吧！</view>
+			<view class="info">我懂得可多了，号称百事通，快来问我吧！</view> -->
 			
-			<view class="bgWrap" :style="{width: systemInfo.screenWidth<=1024?'300px':'750px',height:systemInfo.screenWidth<=1024?'320px':'760px'}">
+			<!-- <view class="bgWrap" :style="{width: systemInfo.screenWidth<=1024?'300px':'750px',height:systemInfo.screenWidth<=1024?'320px':'760px'}">
 				<image :style="{width: systemInfo.screenWidth<=1024?'300px':'750px',height:systemInfo.screenWidth<=1024?'320px':'760px'}" src="../static/bg.png"></image>
 				<view class="voiceGif" @click="refleshPage">
-                    <template v-if="isLoading"><view class="loading"><i class="uni-icon_toast uni-loading"></i></view></template>
                     <image class="imgGif" style="width: 300px;height: 200px;" src="../static/yuyin.gif"></image>
                 </view>
-			</view>
+			</view> -->
+			<!-- <view class="voiceGifWrap" @click="refleshPage">
+				<image class="imgGif" style="width: 300px;height: 200px;" src="../static/yuyin.gif"></image>
+			</view> -->
 
-            <template v-if="!isFright">
+            <!-- <template v-if="!isFright">
                 <div class="tagcloudWrap">
                     <div class="tagcloud">
                         <span>“有什么好吃的”<i class="triangle-down"></i></span>
@@ -29,8 +31,16 @@
                         <span>“我的航班”<i class="triangle-down"></i></span>
                     </div>
                 </div>
-            </template>
+            </template> -->
+
 		</view>
+
+		<view>
+			<view class="loading">
+				<div id="siri-container"></div>
+			</view>
+		</view>
+		
     </view>
 </template>
 
@@ -39,7 +49,8 @@ import {
     mapState,
     mapMutations
 } from 'vuex';
-import tagcloud from '../common/tagcloud.js';
+// import tagcloud from '../common/tagcloud.js';
+import SiriWave from "siriwave";
 export default {
     components: {
 
@@ -47,7 +58,8 @@ export default {
     data() {
         return {
             locale: "",
-            systemInfo: uni.getSystemInfoSync(),
+			systemInfo: uni.getSystemInfoSync(),
+			siriWave: null
         };
     },
     computed: {
@@ -57,19 +69,22 @@ export default {
         isFright(value){
             let self = this;
             if(value == false) {
-                // setTimeout(()=>{
-                //     let tagcloudFun = tagcloud({
-                //         selector: ".tagcloud",//元素选择器
-                //         fontsize: 18,//基本字体大小, 单位px
-                //         radius: self.systemInfo.screenWidth/4,//滚动半径, 单位px
-                //         mspeed: "slow",//滚动最大速度, 取值: slow, normal(默认), fast
-                //         ispeed: "slow",//滚动初速度, 取值: slow, normal(默认), fast
-                //         direction: 0,
-                //         keep: true //鼠标移出组件后是否继续随鼠标滚动, 取值: false, true(默认) 对应 减速至初速度滚动, 随鼠标滚动
-                //     });
-                // }, 1500);
             }
-        }
+		},
+		isLoading(value){
+			let self = this;
+			if(value == true) {
+				// setTimeout(()=>{
+				// 	var siriWave = new SiriWave({
+				// 		container: document.getElementById("siri-container"),
+				// 		width: window.innerWidth,
+				// 		height: 200,
+				// 		color: "#1b63dd",
+				// 		style: "ios9"
+				// 	});
+				// }, 2000);
+			}
+		}
     },
     methods: {
         refleshPage(){
@@ -84,17 +99,17 @@ export default {
     },
 	mounted() {
         let self = this;
-        setTimeout(()=>{
-			let tagcloudFun = tagcloud({
-				selector: ".tagcloud",//元素选择器
-				fontsize: 18,//基本字体大小, 单位px
-				radius: self.systemInfo.screenWidth/4,//滚动半径, 单位px
-				mspeed: "slow",//滚动最大速度, 取值: slow, normal(默认), fast
-				ispeed: "slow",//滚动初速度, 取值: slow, normal(默认), fast
-				direction: 0,
-				keep: true //鼠标移出组件后是否继续随鼠标滚动, 取值: false, true(默认) 对应 减速至初速度滚动, 随鼠标滚动
-			});
-		}, 1500);
+
+		self.siriWave = new SiriWave({
+			container: document.getElementById("siri-container"),
+			width: window.innerWidth,
+			height: 100,
+			color: "#1b63dd",
+			style: "ios9",
+			speed: .7,
+			lerpSpeed: 1,
+			amplitude: 5
+		});
 	},
 };
 </script>
@@ -113,6 +128,19 @@ export default {
 		padding-top: 30px;
 		color: #9d9d9d;
 	}
+	// .voiceGifWrap {
+	// 	width: 200px;
+	// 	height: 200px;
+	// 	margin: 50px auto;
+	// 	border-radius: 50%;
+	// 	overflow: hidden;
+	// 	.imgGif {
+	// 		position: relative;
+	// 		z-index: 0;
+	// 		left: -45px;
+	// 		top: 0px;
+	// 	}
+	// }
 	.bgWrap {
 		position: relative;
 		z-index: 0;
@@ -135,24 +163,15 @@ export default {
 				left: -75px;
 				top: -30px;
 			}
-			.loading {
-				position: absolute;
-				z-index: 10;
-				top: 0;
-				width: 150px;
-				height: 150px;
-				background-color: rgba(0,0,0,.5);
-				text-align: center;
-				.uni-loading {
-					position: relative;
-					z-index: 10;
-					top: 20px;
-					width: 70px;
-					height: 70px;
-				}
-			}
 		}
 	}
+}
+.loading {
+	position: absolute;
+	z-index: 10;
+	bottom: 0;
+	left: 0;
+	text-align: center;
 }
 
 .tagcloudWrap {
@@ -227,15 +246,6 @@ export default {
 					z-index: 0;
 					left: -112px;
 					top: -60px;
-				}
-				.loading {
-					width: 75px;
-					height: 75px;
-					.uni-loading {
-						top: 5px;
-						width: 35px;
-						height: 35px;
-					}
 				}
 			}
 		}
