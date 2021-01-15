@@ -17,6 +17,7 @@
 					<text>航班查询</text>
 				</view>
 			</view>
+
 		</view>
 
         <template v-if="isSubTime">
@@ -60,7 +61,7 @@ export default {
     watch: {
         isLoading(value){
             let self = this;
-            self.timeNum = 30;
+            self.timeNum = self.$config.timeNum;
             self.isTime = false;
 
             clearInterval(self.timeInterval);
@@ -106,7 +107,7 @@ export default {
         // 取消退出
         cancelAction(){
             let self = this;
-            self.timeNum = 30;
+            self.timeNum = self.$config.timeNum;
             self.timeSubNum = 5;
             self.isTime = false;
             self.isSubTime = false;
@@ -146,7 +147,7 @@ export default {
                     if(self.timeNum != 0) {
                         self.timeNum--;
                     }
-                    if(self.timeNum <= 25) {
+                    if(self.timeNum <= 10) {
                         self.setIsNoInput(true);
                     }
                     if (self.timeNum <= 0) {
@@ -155,26 +156,13 @@ export default {
                         self.worker.terminate();
                     }
                 }
-                // self.isTime = true;
-                // self.timeInterval = setInterval(()=>{
-                //     if(self.timeNum != 0) {
-                //         self.timeNum--;
-                //     }
-                //     if(self.timeNum <= 25) {
-                //         self.setIsNoInput(true);
-                //     }
-                //     if (self.timeNum <= 0) {
-                //         self.backActionNav();
-                //     }
-                // },1000);
             }, time);
 
         }
 	},
 	created() {
         let self = this;
-
-        // self.doTimeCountAction();
+        self.timeNum = self.$config.timeNum;
     },
 	mounted() {
         let self = this;
@@ -275,54 +263,54 @@ export default {
 		}
 	}
 }
-.swichPage {
-    position: fixed;
-    z-index: 1000000000;
-    width: 100%;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    top: 0;
-    background-color: rgba(0,0,0,.4);
-    .list {
-        padding-top: 130px;
-        width: 100%;
-        text-align: center;
-        .item {
-            width: 50%;
-            font-size: 32px;
-            color: #fff;
-            margin: 0 auto 30px auto;
-            border-radius: 20px;
-            padding: 40px 0;
-            text-shadow: 0 0 3px rgba(0,0,0,.6);
-            background: #fff url("~@/static/bg.jpg") no-repeat left bottom;
-            background-size: cover;
-            &.item2 {
-                background-position: left -700px;
-            }
-            &.item3 {
-                background-position: right -800px;
-            }
-            &.item4 {
-                background-position: center -900px;
-            }
-            &.item5 {
-                background-position: center -1000px;
-            }
-        }
-        .close {
-            width: 50px;
-            height: 50px;
-            line-height: 50px;
-            margin: 0 auto;
-            border-radius: 50%;
-            text-align: center;
-            background-color: rgba(241,241,244,.8);
-            font-size: 32px;
-        }
-    }
-}
+// .swichPage {
+//     position: fixed;
+//     z-index: 1000000000;
+//     width: 100%;
+//     left: 0;
+//     right: 0;
+//     bottom: 0;
+//     top: 0;
+//     background-color: rgba(0,0,0,.4);
+//     .list {
+//         padding-top: 130px;
+//         width: 100%;
+//         text-align: center;
+//         .item {
+//             width: 50%;
+//             font-size: 32px;
+//             color: #fff;
+//             margin: 0 auto 30px auto;
+//             border-radius: 20px;
+//             padding: 40px 0;
+//             text-shadow: 0 0 3px rgba(0,0,0,.6);
+//             background: #fff url("~@/static/bg.jpg") no-repeat left bottom;
+//             background-size: cover;
+//             &.item2 {
+//                 background-position: left -700px;
+//             }
+//             &.item3 {
+//                 background-position: right -800px;
+//             }
+//             &.item4 {
+//                 background-position: center -900px;
+//             }
+//             &.item5 {
+//                 background-position: center -1000px;
+//             }
+//         }
+//         .close {
+//             width: 50px;
+//             height: 50px;
+//             line-height: 50px;
+//             margin: 0 auto;
+//             border-radius: 50%;
+//             text-align: center;
+//             background-color: rgba(241,241,244,.8);
+//             font-size: 32px;
+//         }
+//     }
+// }
 
 @media screen and (max-width: 1024px) {
 	.header {

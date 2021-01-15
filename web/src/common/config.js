@@ -1,25 +1,27 @@
 const config = (function (config) {
-	config.pageUrl = "http://47.106.235.8:8889/"; // 测试
-	config.assets = "http://47.106.235.8:8888/assets/"; // 测试
-	// 测试环境
+	// // 测试环境
+	// config.pageUrl = "http://47.106.235.8:8889/"; // 测试
+	// config.assets = "http://47.106.235.8:8888/assets/"; // 测试
+	// if (process.env.NODE_ENV === 'development') {
+	// 	config.hostName = "http://47.106.235.8:8888"; // 测试
+	// 	console.log("development");
+	// } else if (process.env.NODE_ENV === 'production') {
+	// 	config.hostName = "http://47.106.235.8:8888"; // 测试
+	// 	console.log("production");
+	// }
+
+	// 现网环境
+	config.pageUrl = "http://10.40.19.180/ht/"; // 现网
+	config.assets = "http://10.40.19.180/ht/assets/"; // 现网
 	if (process.env.NODE_ENV === 'development') {
-		config.hostName = "http://47.106.235.8:8888"; // 测试
+		config.hostName = "http://10.40.19.180/ht";// 现网
 		console.log("development");
 	} else if (process.env.NODE_ENV === 'production') {
-		config.hostName = "http://47.106.235.8:8888"; // 测试
+		config.hostName = "http://10.40.19.180/ht"; // 现网
 		console.log("production");
 	}
 
-	// config.pageUrl = "http://10.40.19.180/ht/"; // 现网
-	// config.assets = "http://10.40.19.180/ht/assets/"; // 现网
-	// // 测试环境
-	// if (process.env.NODE_ENV === 'development') {
-	// 	config.hostName = "http://10.40.19.180/ht";// 现网
-	// 	console.log("development");
-	// } else if (process.env.NODE_ENV === 'production') {
-	// 	config.hostName = "http://10.40.19.180/ht"; // 现网
-	// 	console.log("production");
-	// }
+	config.timeNum = 15;
 
 	//接口动作
 	config.action = {

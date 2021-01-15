@@ -325,6 +325,10 @@ export default {
                             type: 2,
                             suggestAnswer: suggestAnswer //"为您查询到以下结果："
                         });
+                    } else if (res.data.code == "99") {
+                        clearInterval(window.appInfo["_2"]["intervalTime"]);
+                        window.appInfo["_2"]["stopVoice"]();
+                        window.appInfo["_2"]["txtToVoice"](res.data.msg);
                     }
                 },
                 fail(error) {
