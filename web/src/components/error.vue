@@ -13,7 +13,6 @@
 </template>
 
 <script>
-import error from "../common/error";
 export default {
     components: {},
     data() {
@@ -21,9 +20,6 @@ export default {
             isOnline: false,
             timeNum: 15,
             timeInterval: null,
-			errorImg: error.errorImg,
-			errorImgList: [],
-			emergencyList: [],
             systemInfo: uni.getSystemInfoSync(),
         };
     },
@@ -61,14 +57,13 @@ export default {
         onLine(){
             let self = this;
             var img = new Image();
-            img.src = self.$config.pageUrl + "static/favicon.ico?t=" + Date.now();
+            img.src = self.$config.static + "favicon.ico?t=" + Date.now();
             img.onload=function(){
                 self.isOnline = false; 
                 self.timeNum = 15;
                 clearInterval(self.timeInterval);      
             };
             img.onerror=function(){
-                console.log(self.isOnline);
                 self.isOnline = true;
                 self.onLine();   
             };

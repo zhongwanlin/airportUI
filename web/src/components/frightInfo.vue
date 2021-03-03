@@ -628,7 +628,7 @@ export default {
                 }
                 .angle {
                     position: absolute;
-                    right: -22px;
+                    right: -14px;
                     bottom: 5px;
                     width:0; 
                     height:0; 

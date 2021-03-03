@@ -194,7 +194,9 @@ var utility = (function (utility) {
 			"min": min < 10 ? '0' + min : min,
 			"second": second < 10 ? '0' + second : second,
 			"day": day,
-			"weekDay": weekDay[day]
+			"weekDay": weekDay[day],
+			"formatDate": (year + "-" + (month < 10 ? '0' + month : month) + "-" + (date < 10 ? '0' + date : date) + " " + (hour < 10 ? '0' + hour : hour) + ":" + (min < 10 ? '0' + min : min) + ":" + (second < 10 ? '0' + second : second)),
+			"YMD": (year + "-" + (month < 10 ? '0' + month : month) + "-" + (date < 10 ? '0' + date : date))
 		};
 	};
 

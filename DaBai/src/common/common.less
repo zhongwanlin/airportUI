@@ -1,0 +1,42 @@
+@import "./reset.less";
+body {
+  background: url("../static/bg.jpg") no-repeat center 50px;
+  background-size: cover;
+	background-color: #080b2c;
+	max-width: 1080px;
+	uni-toast{
+		.uni-toast {
+			background-color: transparent;
+		}
+	}
+}
+page {
+  color: #666;
+	margin: 0 auto;
+	font-family: 'PingFang SC Medium', 'Helvetica Neue', Helvetica, '微软雅黑', STHeiTi, sans-serif;
+}
+::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    background-color: #f1f1f4;
+  }
+  
+  /*定义滚动条轨道 内阴影+圆角*/
+  
+  ::-webkit-scrollbar-track {
+    box-shadow: 12px 0 0 3px rgba(245, 249, 250, 1);
+    border-radius: 8px;
+    background-color: #f1f1f4;
+  }
+  
+  /*定义滑块 内阴影+圆角*/
+::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    box-shadow: inset 0 0 6px rgba(245, 249, 250, 1);
+    background-color: #cbcbcb;
+}
+@media screen and (max-width: 1024px) {
+	page {
+		max-width: 100%;
+	}
+}

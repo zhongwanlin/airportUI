@@ -46,8 +46,8 @@
         <div class="mainNavTab">
             <template>
                 <Tabs v-model="currentId" type="card" @on-click="setParent" @on-tab-remove="removeTab" :animated="false">
-                    <TabPane class="firstTab" label="旅客使用报表" name="userReport">
-                        <iframe :style="{width: '100%', height: (height-100) + 'px'}" src="#/userReport" frameborder="0"></iframe>
+                    <TabPane class="firstTab" label="用户管理" name="accountManage">
+                        <iframe :style="{width: '100%', height: (height-100) + 'px'}" src="#/accountManage" frameborder="0"></iframe>
                     </TabPane>
                     <template v-for="(value, key) in iframeUrlList">
                         <template v-if="value.isShow==true">
@@ -99,7 +99,7 @@ export default {
     data: () => ({
         userInfo: null,
         height: window.innerHeight,
-        currentId: "userReport",
+        currentId: "accountManage",
         parent: "",
         isIframe: false,
         menuList: {},
@@ -151,7 +151,7 @@ export default {
             self.currentId = item.id;
             self.parent = item.parent;
             clearInterval(window.wecomeInterval);
-            if(item.id != "userReport") {
+            if(item.id != "accountManage") {
                 self.iframeUrlList[item.id] = {
                     isShow: true,
                     item: item

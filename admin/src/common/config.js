@@ -1,7 +1,7 @@
 const config = (function (config) {
+	// 测试环境
 	config.imgPath = "http://47.106.235.8:8888/";
 	config.assets = "http://47.106.235.8:8888/assets/";
-	// 测试环境
 	if (process.env.NODE_ENV === 'development') {
 		config.hostName = "http://47.106.235.8:8888";
 		console.log("development");
@@ -9,6 +9,17 @@ const config = (function (config) {
 		config.hostName = "http://47.106.235.8:8888";
 		console.log("production");
 	}
+
+	// // 现网环境
+	// config.pageUrl = "http://10.40.21.86:8888/"; // 现网
+	// config.assets = "http://10.40.21.86:8888/assets/"; // 现网
+	// if (process.env.NODE_ENV === 'development') {
+	// 	config.hostName = "http://10.40.21.86:8888";// 现网
+	// 	console.log("development");
+	// } else if (process.env.NODE_ENV === 'production') {
+	// 	config.hostName = "http://10.40.21.86:8888"; // 现网
+	// 	console.log("production");
+	// }
 
 	// 接口动作
 	config.action = {

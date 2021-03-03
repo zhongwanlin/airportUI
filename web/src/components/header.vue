@@ -7,11 +7,11 @@
             
 			<view class="box">
 				<view class="nav" @click="backActionNav">
-					<image :style="{width: systemInfo.screenWidth<=1024?'30px':'60px',height:systemInfo.screenWidth<=1024?'30px':'60px'}" src="../static/icon06.png"></image>
+					<image :style="{width: systemInfo.screenWidth<=1024?'30px':'60px',height:systemInfo.screenWidth<=1024?'30px':'60px'}" :src="$config.static+'icon06.png'"></image>
                     <text class="backInfo">返回</text>
 				</view>
 				<view class="icon">
-					<image :style="{width: systemInfo.screenWidth<=1024?'30px':'80px',height:systemInfo.screenWidth<=1024?'30px':'80px'}" src="../static/icon05.png"></image>
+					<image :style="{width: systemInfo.screenWidth<=1024?'30px':'80px',height:systemInfo.screenWidth<=1024?'30px':'80px'}" :src="$config.static+'icon05.png'"></image>
 				</view>
 				<view class="label">
 					<text>航班查询</text>
@@ -67,6 +67,7 @@ export default {
             clearInterval(self.timeInterval);
             clearInterval(self.timeSubInterval);
             clearInterval(self.timeOut);
+
             self.setIsNoInput(false);
 
             if(!!self.worker) {
@@ -91,17 +92,34 @@ export default {
         // 关闭
         backActionNav(){
             let self = this;
+
             clearInterval(self.timeInterval);
             clearInterval(self.timeSubInterval);
             clearInterval(self.timeOut);
+            clearInterval(window.appInfo["_2"]["intervalTime"]);
+            window.appInfo["_2"]["stopVoice"]();
+            
+            if(!!self.worker) {
+                self.worker.postMessage('stop');
+                self.worker.terminate();
+            }
+            self.worker = null;
+            
             if(!!window.jsBridge) {
+                // 销毁语音
                 window.jsBridge.hxpApi(
-                    13,
+                    12,
                     JSON.stringify({}),
-                    function (res) {
-
-                    }.toString()
+                    function (res) {}.toString()
                 );
+                setTimeout(()=>{
+                    // 退出
+                    window.jsBridge.hxpApi(
+                        13,
+                        JSON.stringify({}),
+                        function (res) {}.toString()
+                    );
+                }, 1500);
             }
         },
         // 取消退出
@@ -133,15 +151,15 @@ export default {
         // 执行倒计时
         doTimeCountAction() {
             let self = this;
-            let time = 60000;
+            let time = 30000;
 
             if(self.isFright == true) {
-                time = 60000;
+                time = 30000;
             }
 
             self.timeOut = setTimeout(()=>{
                 self.isTime = true;
-                self.worker = new Worker(self.$config.pageUrl+'static/worker.js');
+                self.worker = new Worker(self.$config.static+'worker.js');
                 self.worker.postMessage('start');
                 self.worker.onmessage = function (event) {
                     if(self.timeNum != 0) {

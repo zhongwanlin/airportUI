@@ -31,17 +31,6 @@ const routes = [{
     }
   },
   
-  //#region 区域管理
-  {
-    name: "regional",
-    path: "/regional",
-    component: () => import("./pages/regConfig/regional.vue"),
-    meta: {
-      title: "区域管理"
-    }
-  },
-  //#endregion
-  
   //#region 内容管理
   {
     name: "columnManage",
@@ -124,9 +113,17 @@ const routes = [{
   {
     name: "accountManage",
     path: "/accountManage",
-    component: () => import("./pages/system/accountManage.vue"),
+    component: () => import("./pages/system/users.vue"),
     meta: {
-      title: "账号管理"
+      title: "用户管理"
+    }
+  },
+  {
+    name: "logInfo",
+    path: "/logInfo",
+    component: () => import("./pages/system/log.vue"),
+    meta: {
+      title: "日志管理"
     }
   },
   {
@@ -135,6 +132,22 @@ const routes = [{
     component: () => import("./pages/system/params.vue"),
     meta: {
       title: "参数配置"
+    }
+  },
+  {
+    name: "emergency",
+    path: "/emergency",
+    component: () => import("./pages/system/emergency.vue"),
+    meta: {
+      title: "紧急预案"
+    }
+  },
+  {
+    name: "advert",
+    path: "/advert",
+    component: () => import("./pages/system/advert.vue"),
+    meta: {
+      title: "广告资源管理"
     }
   },
   //#endregion
@@ -151,14 +164,14 @@ const routes = [{
   //#endregion
 
   //#region 紧急预案
-  {
-    name: "emergency",
-    path: "/emergency",
-    component: () => import("./pages/emergency/index.vue"),
-    meta: {
-      title: "紧急预案"
-    }
-  },
+  // {
+  //   name: "emergency",
+  //   path: "/emergency",
+  //   component: () => import("./pages/emergency/index.vue"),
+  //   meta: {
+  //     title: "紧急预案"
+  //   }
+  // },
   //#endregion
 
   //#region 用户反馈
@@ -199,7 +212,15 @@ const routes = [{
     meta: {
       title: "设备列表"
     }
-  }
+  },
+  {
+    name: "regional",
+    path: "/regional",
+    component: () => import("./pages/deviceManage/regional.vue"),
+    meta: {
+      title: "区域管理"
+    }
+  },
   //#endregion
 ];
 

@@ -18,17 +18,16 @@
 
         <!-- 应急预案组件 -->
         <Error />
-
-        <!-- <div style="position: fixed; bottom: 0;z-index: 10000;font-size: 18px;color: #000;min-height: 100px;width: 100%; max-height: 600px; overflow-y: auto;" @click="isLog=!isLog">
-            <template v-if="isLog"> -->
-                <!-- <p>voiceTxtInfo:{{voiceTxtInfo}}</p>
-                <p>voiceTxtShow:{{voiceTxtShow}}</p>
-                <p>flgVoiceList:{{flgVoiceList.length}}</p>
-                <p>res:{{res}}</p>
-                <p>timeNum:{{timeNum}}</p> -->
-                <!-- <p>actions:{{source}}</p> -->
-            <!-- </template>
-        </div> -->
+        
+        <div ref="logInfo" style="position: fixed; bottom: 0;z-index: 10;font-size: 12px;color: #000;min-height: 100px;width: 100%; padding-bottom: 20px; max-height: 600px; overflow-y: auto;" @click="isLog=!isLog">
+            <template v-if="isLog">
+                <div style="padding-bottom: 10px;">日志信息: <p v-html="logInfo.join('')"></p></div>
+                <div>ErrorCode: {{errorCode.join(",")}}</div>
+                <div>收音调用次数: {{timeNum3}} 次</div>
+                <div>计数器：{{voiceingNum}}次 </div>
+                <div>正在收音：{{isVoiceing}} </div>
+            </template>
+        </div>
 
     </view>
 </template>
@@ -60,11 +59,20 @@ export default {
             voiceTxtShow: "",
             saidText: "",
             res: "",
-            timeNum: 0,
+            errorCode: [],
+            timeNum0: 0,
+            timeNum1: 0,
+            timeNum2: 0,
+            timeNum3: 0,
             source: "",
             voiceTxtInfo: [],
             flgVoiceList: [],
+            logInfo: [],
             isLog: false,
+            isVoiceDone: false,
+            isVoiceing: false,
+            voiceingNum: 0,
+            voiceInterval: null,
             systemInfo: uni.getSystemInfoSync(),
         };
     },
@@ -84,10 +92,34 @@ export default {
         ])
     },
     watch: {
-        isNoInput(value) {
+        isFright(value) {
+            // let self = this;
+            // window.appInfo["_2"]["stopVoice"]();
+            // clearInterval(window.appInfo["_2"]["intervalTime"]);
+            // setTimeout(() => {
+            //     window.appInfo["_2"]["userVoice"]();
+            // }, 50);
+        },
+        // 如果语言播报完后
+        isVoiceDone(value){
             let self = this;
-            if (value == true) {
-                // self.flightSearch("silent");
+            if(value == true) {
+                clearInterval(window.appInfo["_2"]["intervalTime"]);
+                window.appInfo["_2"]["userVoice"]();
+
+                if(window.appInfo["_0"]["isExit"] == true) {
+                    window.appInfo["_0"]["backActionNav"]();
+                    window.appInfo["_0"]["isExit"] = false;
+                }
+
+                let list = window.appInfo["_2"]["getSuggestAnswerInfo"]();
+                if (!!list && list.length > 0) {
+                    list.forEach((item, index) => {
+                        window.appInfo["_2"]["editSuggestAnswerInfo"](index);
+                    });
+                }
+
+                window.appInfo["_0"]["setTimeNum0"]();
             }
         },
         isRestart(value) {
@@ -142,6 +174,26 @@ export default {
             };
         },
 
+        // 
+        aiBLog(callback) {
+            var self = this;
+            uni.request({
+                header: {
+                    gomstoken: "866822030391163", //(window.appInfo["_1"]["imei"] || "866822030391163")
+                },
+                url: self.$config.action.aiBLog,
+                method: "POST",
+                success(res, statusCode, header) {
+                    callback && callback();
+                },
+                fail(error) {
+                    console.log(error);
+                    callback && callback();
+                }
+            });
+
+        },
+
         // 获取航班
         flightSearch(restart) {
             var self = this;
@@ -153,9 +205,10 @@ export default {
                 url: self.$config.action.terminalVoice,
                 method: "POST",
                 data: {
-                    "content": restart || (self.voiceTxtShow.split("time")[0]).replace(/@"\p{P}|\s"/g, "") || "",
+                    "content": restart || ((self.voiceTxtShow.split("time")[0]).replace(/@"\p{P}|\s"/g, "") || ""),
                     "sessionId": self.sessionId,
-                    "flag": (typeof restart != 'undefined' && restart == "错误_count") ? 3 : self.isFright ? 2 : 0
+                    "flag": (typeof restart != 'undefined' && restart == "错误_count") ? 3 : 0
+                    // self.isFright ? 2 :
                 },
                 success(res, statusCode, header) {
                     if (res.data.code == "200") {
@@ -173,7 +226,7 @@ export default {
                             suggestAnswer = res.data.data.suggestAnswer;
                             clearInterval(window.appInfo["_2"]["intervalTime"]);
                             window.appInfo["_2"]["stopVoice"]();
-                            window.appInfo["_2"]["txtToVoice"](voiceInfo);
+                            window.appInfo["_2"]["txtToVoice"](voiceInfo||"");
 
                             if (restart == "restart") {
                                 self.clearSuggestAnswer();
@@ -326,14 +379,14 @@ export default {
                             suggestAnswer: suggestAnswer //"为您查询到以下结果："
                         });
                     } else if (res.data.code == "99") {
-                        clearInterval(window.appInfo["_2"]["intervalTime"]);
-                        window.appInfo["_2"]["stopVoice"]();
                         window.appInfo["_2"]["txtToVoice"](res.data.msg);
                     }
                 },
                 fail(error) {
                     console.log(error);
-                    window.appInfo["_2"]["userVoice"]();
+                    // clearInterval(window.appInfo["_2"]["intervalTime"]);
+                    // window.appInfo["_2"]["stopVoice"]();
+                    // window.appInfo["_2"]["userVoice"]();
                 }
             });
 
@@ -367,11 +420,11 @@ export default {
                            self.setIsFright(true); 
                         }
                     }
-                    // window.appInfo["_2"]["userVoice"]();
                 },
                 fail(error) {
                     console.log(error);
-                    window.appInfo["_2"]["userVoice"]();
+                    // window.appInfo["_2"]["stopVoice"]();
+                    // window.appInfo["_2"]["userVoice"]();
                 }
             });
 
@@ -421,13 +474,22 @@ export default {
                 if (!window.jsBridge) {
                     return;
                 }
+                clearInterval(window.appInfo["_2"]["intervalTime"]);
+                window.appInfo["_2"]["stopVoice"]();
+                // 销毁语音
                 window.jsBridge.hxpApi(
-                    13,
+                    12,
                     JSON.stringify({}),
-                    function (res) {
-                        alert('按下物理返回键');
-                    }.toString()
+                    function (res) {}.toString()
                 );
+                setTimeout(()=>{
+                    // 退出
+                    window.jsBridge.hxpApi(
+                        13,
+                        JSON.stringify({}),
+                        function (res) {}.toString()
+                    );
+                }, 1500);
             };
         },
 
@@ -525,28 +587,62 @@ export default {
         userVoice() {
             let self = this;
             return function () {
-                if (!!window.jsBridge) {
-                    self.setIsLoading(true);
-                    //  "receiveMode": "Final"
-                    // {"receiveMode":"Partial"} or {"receiveMode":"Final"}
-                    window.jsBridge.hxpApi(
-                        5,
-                        JSON.stringify({"receiveMode": "Final"}),
-                        function (res) {
-                            var voiceStr = JSON.parse(res)["voiceStr"];
-                            let voiceTxt = window.appInfo["_0"]["resetNumber"](voiceStr);
 
-                            window.appInfo["_2"]["setShowVoiceTxtInfo"](voiceTxt);
-                            window.appInfo["_2"]["setSuggestAnswerInfo"]({
-                                type: 1,
-                                suggestAnswer: voiceTxt.slice(0, voiceTxt.length - 1)
-                            });
-
-                            window.appInfo["_0"]["setFlightSearch"]();
-
-                        }.toString()
-                    );
+                if(self.isVoiceDone == false) {
+                    return;
                 }
+
+                window.appInfo["_0"]["setTimeNum3"]();
+
+                setTimeout(()=>{
+                    if (!!window.jsBridge) {
+                        self.setIsLoading(true);
+                        window.jsBridge.hxpApi(
+                            5,
+                            JSON.stringify({"receiveMode": "Final"}),
+                            function (res) {
+                                var res = JSON.parse(res);
+
+                                window.appInfo["_0"]["setErrorCode"](res.errorCode);
+
+                                // var voiceStr = res["voiceStr"];
+                                // let voiceTxt = window.appInfo["_0"]["resetNumber"](voiceStr);
+                                // window.appInfo["_2"]["setShowVoiceTxtInfo"](voiceTxt);
+                                // window.appInfo["_2"]["setSuggestAnswerInfo"]({
+                                //     type: 1,
+                                //     suggestAnswer: voiceTxt.slice(0, voiceTxt.length - 1)
+                                // });
+                                // window.appInfo["_0"]["setFlightSearch"]();
+
+                                if(typeof res.errorCode != "undefined") {
+                                    if(res.errorCode == 0) {
+                                        let voiceStr = res["voiceStr"];
+                                        let voiceTxt = window.appInfo["_0"]["resetNumber"](voiceStr);
+                                        window.appInfo["_2"]["setShowVoiceTxtInfo"](voiceTxt);
+                                        window.appInfo["_2"]["setVoiceTxtList"](voiceTxt);
+                                        window.appInfo["_2"]["setSuggestAnswerInfo"]({
+                                            type: 1,
+                                            suggestAnswer: voiceTxt.slice(0, voiceTxt.length - 1)
+                                        });
+                                        window.appInfo["_0"]["setFlightSearch"]();
+                                        window.appInfo["_0"]["setTimeNum1"]();
+                                    }
+                                } else {
+                                    var voiceStr = res["voiceStr"];
+                                    let voiceTxt = window.appInfo["_0"]["resetNumber"](voiceStr);
+                                    window.appInfo["_2"]["setShowVoiceTxtInfo"](voiceTxt);
+                                    window.appInfo["_2"]["setSuggestAnswerInfo"]({
+                                        type: 1,
+                                        suggestAnswer: voiceTxt.slice(0, voiceTxt.length - 1)
+                                    });
+                                    window.appInfo["_0"]["setFlightSearch"]();
+                                    window.appInfo["_0"]["setTimeNum1"]();
+                                }
+
+                            }.toString()
+                        );
+                    }
+                }, 0);
             };
         },
 
@@ -554,7 +650,7 @@ export default {
         stopVoice() {
             let self = this;
             return function (callback) {
-                clearInterval(window.appInfo["_2"]["intervalTime"]);
+                self.voiceingNum = 0;
                 if (!!window.jsBridge) {
                     window.jsBridge.hxpApi(
                         10,
@@ -570,6 +666,9 @@ export default {
             let self = this;
 
             return function (txt, type) {
+                clearInterval(window.appInfo["_2"]["intervalTime"]);
+                window.appInfo["_2"]["stopVoice"]();
+                window.appInfo["_0"]["setIsVoiceDone"](false);
                 if (!!window.jsBridge) {
                     window.jsBridge.hxpApi(
                         11,
@@ -579,26 +678,7 @@ export default {
                         }),
                         function (res) {
 
-                            setTimeout(() => {
-                                window.appInfo["_2"]["userVoice"]();
-                            }, 150);
-
-                            clearInterval(window.appInfo["_2"]["intervalTime"]);
-                            window.appInfo["_2"]["intervalTime"] = setInterval(() => {
-                                window.appInfo["_2"]["userVoice"]();
-                            }, 5000);
-
-                            if(window.appInfo["_0"]["isExit"] == true) {
-                                window.appInfo["_0"]["backActionNav"]();
-                                window.appInfo["_0"]["isExit"] = false;
-                            }
-
-                            let list = window.appInfo["_2"]["getSuggestAnswerInfo"]();
-                            if (!!list && list.length > 0) {
-                                list.forEach((item, index) => {
-                                    window.appInfo["_2"]["editSuggestAnswerInfo"](index);
-                                });
-                            }
+                            window.appInfo["_0"]["setIsVoiceDone"](true);
 
                         }.toString()
                     );
@@ -650,14 +730,8 @@ export default {
         // 设置录音列表数据
         setVoiceTxtList() {
             let self = this;
-            return function (txt, bool) {
-                if (bool == true) {
-                    self.voiceTxtInfo.push(txt);
-                } else {
-                    self.voiceTxtInfo = [];
-                }
-                self.saidText = txt;
-                return self.voiceTxtInfo;
+            return function (txt) {
+                self.voiceTxtInfo.push(txt);
             }
         },
 
@@ -672,9 +746,151 @@ export default {
         init() {
             let self = this;
             return function () {
-                self.userCamera(self); // 使用摄像头
-                self.$utility.setSessionStorage("faceInfo", null);
+                let currentTimeInfo = self.$utility.getCurrentTimeInfo(new Date());
+                window.appInfo["_2"]["userVoice"]();
+                self.saveLogInfo(currentTimeInfo.ymrhsm);
+                window.appInfo['_0']['setLog'](currentTimeInfo.ymrhsm);
+                setTimeout(()=>{
+                    window.appInfo["_2"]["stopVoice"]();
+                    self.setIsLoading(true);
+                    self.flightSearch();
+                }, 250);
+
             };
+        },
+
+        // log
+        setLog(){
+            let self = this;
+            return function (logInfo) {
+                self.logInfo.push(logInfo);
+                self.$nextTick(() => {
+                    self.$refs.logInfo.scrollTop = self.$refs.logInfo.scrollHeight;
+                });
+
+                // 如果有错误编码
+                if(logInfo.indexOf("subErrorCode")!=-1) {
+                    self.saveLogInfo(logInfo);
+                    window.appInfo["_0"]["setIsVoiceing"](false);
+                    // 长时间没对话
+                    if(
+                        logInfo.indexOf("subErrorCode:3101") != -1 ||
+                        logInfo.indexOf("subErrorCode:8001")!=-1 ||
+                        logInfo.indexOf("subErrorCode:3001")!=-1
+                    ) {
+                        self.voiceingNum++;
+                    } else if( 
+                        logInfo.indexOf("subErrorCode:1") != -1 ||
+                        logInfo.indexOf("subErrorCode:2") != -1 ||
+                        logInfo.indexOf("subErrorCode:3") != -1 ||
+                        logInfo.indexOf("subErrorCode:4") != -1
+                    ) {
+                        self.voiceingNum = 0;
+                    }
+                }
+                // 一轮对话生命周期
+                // onAsrReady
+                // onAsrBegin
+                // 日志正在录音：640
+                // 日志正在录音：640
+                // 日志正在录音：640
+                // 日志正在录音：640
+                // 日志正在录音：640
+                // 日志正在录音：640
+                // 日志正在录音：640
+                // ......
+                // 可能有错误编码......
+                // onAsrEnd
+                // onAsrFinalReslut
+                // onAsrFinish
+                // onAsrExit
+
+                // 录音中...
+                if(logInfo.indexOf("640") != -1) {
+                    window.appInfo["_0"]["setIsVoiceing"](true);
+                    self.voiceingNum++;
+                }
+
+                if(self.voiceingNum > 16) {
+                    window.appInfo["_0"]["setIsVoiceing"](true);
+                    window.appInfo["_2"]["stopVoice"]();
+                    setTimeout(()=>{
+                        window.appInfo["_2"]["userVoice"]();
+                    }, 50);
+                }
+            };
+        },
+
+        setTimeNum0(){
+            let self = this;
+            return function () {
+                self.timeNum0++
+            };
+        },
+        setTimeNum1(){
+            let self = this;
+            return function () {
+                self.timeNum1++
+            };
+        },
+        setTimeNum2(){
+            let self = this;
+            return function () {
+                self.timeNum2++
+            };
+        },
+        setTimeNum3(){
+            let self = this;
+            return function () {
+                self.timeNum3++
+            };
+        },
+        setErrorCode(){
+            let self = this;
+            return function (errorCode) {
+                self.errorCode.push(errorCode); // 使用摄像头
+            };
+        },
+        setIsVoiceDone(){
+            let self = this;
+            return function (isVoiceDone) {
+                self.isVoiceDone = isVoiceDone // 使用摄像头
+                return isVoiceDone;
+            };
+        },
+        setIsVoiceing(){
+            let self = this;
+            return function (isVoiceing) {
+                self.isVoiceing = isVoiceing;
+            };
+        },
+        getIsVoiceing(){
+            let self = this;
+            return function () {
+                return self.isVoiceing;
+            };
+        },
+
+        // 获取航班
+        saveLogInfo(logInfo) {
+            var self = this;
+            uni.request({
+                header: {
+                    gomstoken: "866822030391163", //(window.appInfo["_1"]["imei"] || "866822030391163")
+                },
+                url: self.$config.action.asrLog,
+                method: "POST",
+                data: {
+                    "content": logInfo,
+                    "sessionId": self.sessionId,
+                    "flag": 0
+                },
+                success(res, statusCode, header) {},
+                fail(error) {
+                    console.log(error);
+                }
+            });
+
         },
 
     },
@@ -682,11 +898,11 @@ export default {
         let self = this;
         let userTimeOut = null;
 
-        window.appInfo["_0"]["init"] = self.init();
-        window.appInfo["_0"]["resetNumber"] = self.resetNumber();
-        window.appInfo["_0"]["setFlightSearch"] = self.setFlightSearch();
-        window.appInfo["_0"]["backActionNav"] = self.backActionNav();
-        window.appInfo["_0"]["isExit"] = false;
+        window.appInfo["_0"]["init"] = self.init(); // 初始化 暂时没用到
+        window.appInfo["_0"]["resetNumber"] = self.resetNumber(); // 把中文数字转为阿拉伯数字
+        window.appInfo["_0"]["setFlightSearch"] = self.setFlightSearch(); // 查航班
+        window.appInfo["_0"]["backActionNav"] = self.backActionNav(); // 回退
+        window.appInfo["_0"]["isExit"] = false; // 标记是否退出
 
         window.appInfo["_2"]["userVoice"] = self.userVoice(); // 使用语音模块
         window.appInfo["_2"]["stopVoice"] = self.stopVoice(); // 停止语音模块
@@ -694,47 +910,29 @@ export default {
         window.appInfo["_2"]["txtToVoice"] = self.txtToVoice(); // 文字转语音
         window.appInfo["_2"]["setVoiceTxtList"] = self.setVoiceTxtList(); // 文字内容
 
-        window.appInfo["_2"]["setSuggestAnswerInfo"] = self.setSuggestAnswerInfo(); // 
-        window.appInfo["_2"]["editSuggestAnswerInfo"] = self.editSuggestAnswerInfo(); // 
-        window.appInfo["_2"]["getSuggestAnswerInfo"] = self.getSuggestAnswerInfo(); // 
-        window.appInfo["_2"]["setSuggestAnswerByIndex"] = self.setSuggestAnswerByIndex(); // 
+        window.appInfo["_2"]["setSuggestAnswerInfo"] = self.setSuggestAnswerInfo(); // 设置对话内容
+        window.appInfo["_2"]["editSuggestAnswerInfo"] = self.editSuggestAnswerInfo(); // 修改对话内容
+        window.appInfo["_2"]["getSuggestAnswerInfo"] = self.getSuggestAnswerInfo(); // 获取对话内容
+        window.appInfo["_2"]["setSuggestAnswerByIndex"] = self.setSuggestAnswerByIndex(); // 根据索引获取对话内容
 
-        window.appInfo["_2"]["setFlgVoiceList"] = self.setFlgVoiceList(); // 
-
+        // 收音定时器
         window.appInfo["_2"]["intervalTime"] = null;
-        window.appInfo["_2"]["overVoiceList"] = null;
-        window.appInfo["_2"]["overVoiceSubList"] = null;
-        window.appInfo["_2"]["overVoiceSearch"] = null;
-        window.appInfo["_2"]["userVoiceList"] = [];
 
-        self.setIsLoading(true);
-        // self.getTerminalInfo();
-        self.flightSearch();
-        // self.flightSearch("33333");
+        // 记录日志
+        window.appInfo['_0']['setLog'] = self.setLog();
+        window.appInfo["_0"]["setTimeNum0"] = self.setTimeNum0();
+        window.appInfo["_0"]["setTimeNum1"] = self.setTimeNum1();
+        window.appInfo["_0"]["setTimeNum2"] = self.setTimeNum2();
+        window.appInfo["_0"]["setTimeNum3"] = self.setTimeNum3();
+        window.appInfo["_0"]["setErrorCode"] = self.setErrorCode();
+        window.appInfo["_0"]["setIsVoiceDone"] = self.setIsVoiceDone(); // 设置是否播报完
+        window.appInfo["_0"]["setIsVoiceing"] = self.setIsVoiceing(); // 设置是否正在收音
+        window.appInfo["_0"]["getIsVoiceing"] = self.getIsVoiceing(); // 获取是否正在收音
+        window.appInfo["_0"]["setFlgVoiceList"] = self.setFlgVoiceList(); //
 
-        if (!!window.jsBridge) {
-            // 获取设备信息
-            // self.getTerminalInfo();
+        // 初始化
+        window.appInfo["_0"]["init"]();
 
-            // self.flightSearch();
-
-            // self.setSuggestAnswer({
-            //     type: 2,
-            //     suggestAnswer: "嗨，我是机场语音小助手"
-            // });
-
-            // // 文字转语音
-            // window.appInfo["_2"]["txtToVoice"]("嗨，我是机场语音小助手");
-
-            // // 人脸识别
-            // self.userCamera(self);
-
-            // // 扫机票
-            // self.sweepTicket();
-
-            // // 扫身份证
-            // self.scanIDCard();
-        }
     },
     mounted() {
         let self = this;
