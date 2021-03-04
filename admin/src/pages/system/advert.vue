@@ -478,37 +478,37 @@ export default {
         let userTimeOut = null;
         self.userInfo = self.$utility.getLocalStorage("userInfo");
         
-        // self.getList(true); // 获取预案
+        self.getList(true); // 获取预案
         self.getDeviceList(true); // 获取设备
 
-        self.realTimeDataList = [{
-            "id": 0,
-            "name": "资源名称1",
-            "create_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
-            "update_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
-            "status": 1,
-            "macInfos": [
-                "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.newssoon.com"
-            ],
-        },{
-            "id": 1,
-            "name": "资源名称2",
-            "create_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
-            "update_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
-            "status": 1,
-            "macInfos": [
-                "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.newssoon.com"
-            ],
-        },{
-            "id": 2,
-            "name": "资源名称3",
-            "create_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
-            "update_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
-            "status": 1,
-            "macInfos": [
-                "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.newssoon.com"
-            ],
-        }];
+        // self.realTimeDataList = [{
+        //     "id": 0,
+        //     "name": "资源名称1",
+        //     "create_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
+        //     "update_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
+        //     "status": 1,
+        //     "macInfos": [
+        //         "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.newssoon.com"
+        //     ],
+        // },{
+        //     "id": 1,
+        //     "name": "资源名称2",
+        //     "create_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
+        //     "update_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
+        //     "status": 1,
+        //     "macInfos": [
+        //         "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.newssoon.com"
+        //     ],
+        // },{
+        //     "id": 2,
+        //     "name": "资源名称3",
+        //     "create_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
+        //     "update_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
+        //     "status": 1,
+        //     "macInfos": [
+        //         "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.newssoon.com"
+        //     ],
+        // }];
 
         self.$watch('searchInfo', function () {
             clearTimeout(userTimeOut);

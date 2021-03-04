@@ -478,43 +478,43 @@ export default {
         let userTimeOut = null;
         self.userInfo = self.$utility.getLocalStorage("userInfo");
         
-        // self.getList(true); // 获取预案
+        self.getList(true); // 获取预案
         self.getDeviceList(true); // 获取设备
 
-        self.realTimeDataList = [{
-            "id": 0,
-            "macInfos": [{"name": "866822030391163"},{"name": "866822030391163"}],
-            "name": "测试预案1",
-            "create_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
-            "update_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
-            "status": 1,
-            "urls": [
-                "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.newssoon.com%2Fuploadfile%2F2018%2F0530%2F20180530010203379.jpg&refer=http%3A%2F%2Fwww.newssoon.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1617370594&t=6b947c9d3c3b74e724825d26bbeb5b25",
-                "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fdpic.tiankong.com%2F03%2Fv3%2FQJ7108584720.jpg&refer=http%3A%2F%2Fdpic.tiankong.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1617370594&t=a972bd7f0584a858869a0f9d3662a73d"
-            ],
-        },{
-            "id": 1,
-            "macInfos": [{"name": "866822030391163"},{"name": "866822030391163"}],
-            "name": "测试预案2",
-            "create_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
-            "update_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
-            "status": 1,
-            "urls": [
-                "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.newssoon.com%2Fuploadfile%2F2018%2F0530%2F20180530010203379.jpg&refer=http%3A%2F%2Fwww.newssoon.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1617370594&t=6b947c9d3c3b74e724825d26bbeb5b25",
-                "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fdpic.tiankong.com%2F03%2Fv3%2FQJ7108584720.jpg&refer=http%3A%2F%2Fdpic.tiankong.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1617370594&t=a972bd7f0584a858869a0f9d3662a73d"
-            ],
-        },{
-            "id": 2,
-            "macInfos": [{"name": "866822030391163"},{"name": "866822030391163"}],
-            "name": "测试预案3",
-            "create_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
-            "update_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
-            "status": 1,
-            "urls": [
-                "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.newssoon.com%2Fuploadfile%2F2018%2F0530%2F20180530010203379.jpg&refer=http%3A%2F%2Fwww.newssoon.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1617370594&t=6b947c9d3c3b74e724825d26bbeb5b25",
-                "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fdpic.tiankong.com%2F03%2Fv3%2FQJ7108584720.jpg&refer=http%3A%2F%2Fdpic.tiankong.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1617370594&t=a972bd7f0584a858869a0f9d3662a73d"
-            ],
-        }];
+        // self.realTimeDataList = [{
+        //     "id": 0,
+        //     "macInfos": [{"name": "866822030391163"},{"name": "866822030391163"}],
+        //     "name": "测试预案1",
+        //     "create_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
+        //     "update_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
+        //     "status": 1,
+        //     "urls": [
+        //         "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.newssoon.com%2Fuploadfile%2F2018%2F0530%2F20180530010203379.jpg&refer=http%3A%2F%2Fwww.newssoon.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1617370594&t=6b947c9d3c3b74e724825d26bbeb5b25",
+        //         "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fdpic.tiankong.com%2F03%2Fv3%2FQJ7108584720.jpg&refer=http%3A%2F%2Fdpic.tiankong.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1617370594&t=a972bd7f0584a858869a0f9d3662a73d"
+        //     ],
+        // },{
+        //     "id": 1,
+        //     "macInfos": [{"name": "866822030391163"},{"name": "866822030391163"}],
+        //     "name": "测试预案2",
+        //     "create_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
+        //     "update_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
+        //     "status": 1,
+        //     "urls": [
+        //         "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.newssoon.com%2Fuploadfile%2F2018%2F0530%2F20180530010203379.jpg&refer=http%3A%2F%2Fwww.newssoon.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1617370594&t=6b947c9d3c3b74e724825d26bbeb5b25",
+        //         "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fdpic.tiankong.com%2F03%2Fv3%2FQJ7108584720.jpg&refer=http%3A%2F%2Fdpic.tiankong.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1617370594&t=a972bd7f0584a858869a0f9d3662a73d"
+        //     ],
+        // },{
+        //     "id": 2,
+        //     "macInfos": [{"name": "866822030391163"},{"name": "866822030391163"}],
+        //     "name": "测试预案3",
+        //     "create_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
+        //     "update_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
+        //     "status": 1,
+        //     "urls": [
+        //         "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fwww.newssoon.com%2Fuploadfile%2F2018%2F0530%2F20180530010203379.jpg&refer=http%3A%2F%2Fwww.newssoon.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1617370594&t=6b947c9d3c3b74e724825d26bbeb5b25",
+        //         "https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fdpic.tiankong.com%2F03%2Fv3%2FQJ7108584720.jpg&refer=http%3A%2F%2Fdpic.tiankong.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1617370594&t=a972bd7f0584a858869a0f9d3662a73d"
+        //     ],
+        // }];
 
         self.$watch('searchInfo', function () {
             clearTimeout(userTimeOut);

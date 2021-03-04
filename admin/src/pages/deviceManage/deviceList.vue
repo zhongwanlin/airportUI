@@ -446,47 +446,47 @@ export default {
         let userTimeOut = null;
         self.userInfo = self.$utility.getLocalStorage("userInfo");
         
-        // self.getList(true); // 获取角色
+        self.getList(true); // 获取角色
         self.getAreaList(true); // 获取角色
         self.getVersionList(true); // 获取版本
 
-        self.realTimeDataList = [{
-            "areaName": "231234",
-            "dep_status": 1,
-            "id": 0,
-            "mac_id": "v029228282828",
-            "name": "设备名称",
-            "version": "V0001",
-            "create_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
-            "update_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
-        },{
-            "areaName": "231234",
-            "dep_status": 1,
-            "id": 0,
-            "mac_id": "v029228282828",
-            "name": "设备名称",
-            "version": "V0001",
-            "create_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
-            "update_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
-        },{
-            "areaName": "231234",
-            "dep_status": 1,
-            "id": 0,
-            "mac_id": "v029228282828",
-            "name": "设备名称",
-            "version": "V0001",
-            "create_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
-            "update_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
-        },{
-            "areaName": "231234",
-            "dep_status": 1,
-            "id": 0,
-            "mac_id": "v029228282828",
-            "name": "设备名称",
-            "version": "V0001",
-            "create_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
-            "update_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
-        }];
+        // self.realTimeDataList = [{
+        //     "areaName": "231234",
+        //     "dep_status": 1,
+        //     "id": 0,
+        //     "mac_id": "v029228282828",
+        //     "name": "设备名称",
+        //     "version": "V0001",
+        //     "create_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
+        //     "update_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
+        // },{
+        //     "areaName": "231234",
+        //     "dep_status": 1,
+        //     "id": 0,
+        //     "mac_id": "v029228282828",
+        //     "name": "设备名称",
+        //     "version": "V0001",
+        //     "create_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
+        //     "update_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
+        // },{
+        //     "areaName": "231234",
+        //     "dep_status": 1,
+        //     "id": 0,
+        //     "mac_id": "v029228282828",
+        //     "name": "设备名称",
+        //     "version": "V0001",
+        //     "create_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
+        //     "update_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
+        // },{
+        //     "areaName": "231234",
+        //     "dep_status": 1,
+        //     "id": 0,
+        //     "mac_id": "v029228282828",
+        //     "name": "设备名称",
+        //     "version": "V0001",
+        //     "create_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
+        //     "update_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
+        // }];
 
         self.$watch('searchInfo', function () {
             clearTimeout(userTimeOut);

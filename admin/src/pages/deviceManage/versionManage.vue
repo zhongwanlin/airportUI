@@ -412,33 +412,33 @@ export default {
         let userTimeOut = null;
         self.userInfo = self.$utility.getLocalStorage("userInfo");
         
-        // self.getList(true); // 获取角色
+        self.getList(true); // 获取角色
 
-        self.realTimeDataList = [{
-            "id": 0,
-            "info": "测试",
-            "md5": "asd23723asfiqwe89q232",
-            "url": "http://www.baidu.com",
-            "version": "v0202020",
-            "create_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
-            "update_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
-        },{
-            "id": 0,
-            "info": "测试",
-            "md5": "asd23723asfiqwe89q232",
-            "url": "http://www.baidu.com",
-            "version": "v0202020",
-            "create_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
-            "update_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
-        },{
-            "id": 0,
-            "info": "测试",
-            "md5": "asd23723asfiqwe89q232",
-            "url": "http://www.baidu.com",
-            "version": "v0202020",
-            "create_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
-            "update_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
-        }];
+        // self.realTimeDataList = [{
+        //     "id": 0,
+        //     "info": "测试",
+        //     "md5": "asd23723asfiqwe89q232",
+        //     "url": "http://www.baidu.com",
+        //     "version": "v0202020",
+        //     "create_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
+        //     "update_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
+        // },{
+        //     "id": 0,
+        //     "info": "测试",
+        //     "md5": "asd23723asfiqwe89q232",
+        //     "url": "http://www.baidu.com",
+        //     "version": "v0202020",
+        //     "create_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
+        //     "update_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
+        // },{
+        //     "id": 0,
+        //     "info": "测试",
+        //     "md5": "asd23723asfiqwe89q232",
+        //     "url": "http://www.baidu.com",
+        //     "version": "v0202020",
+        //     "create_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
+        //     "update_time": self.$utility.getCurrentTimeInfo(new Date())["formatDate"],
+        // }];
 
         self.$watch('searchInfo', function () {
             clearTimeout(userTimeOut);
